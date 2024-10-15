@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ImageCard from './image-card'
 import ImageModal from './image-modal'
+import { Toaster } from './ui/toaster'
 
 type ImageData = {
   tags: string[]
@@ -140,6 +141,7 @@ export default function ImageGallery() {
         isOpen={!!selectedImage}
         onClose={handleCloseModal}
       />
+      <Toaster />
     </div>
   )
 }
