@@ -54,6 +54,7 @@ export default function ImageGallery() {
       // {"status":"no result"}
       if (data.status === 'no result') {
         setError('No result found for the search keyword, please try another one.')
+        return
       }
       setImages(data.data)
     } catch (err) {
