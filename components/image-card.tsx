@@ -80,8 +80,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
       ]);
       toast({
         title: "图片已复制到剪贴板",
-        description:
-          "快粘贴到EP群里分享给大家吧！",
+        description: "快粘贴到EP群里分享给大家吧！",
       });
     } catch (error) {
       console.error("Copy to clipboard failed:", error);
@@ -157,33 +156,19 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
             </div>
           </PhotoView>
         </PhotoProvider>
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 right-2 flex gap-2">
           <Button
             className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
-            onClick={() => setShowTools(!showTools)}
+            onClick={handleDownload}
           >
-            <MoreVertical className="h-6 w-6" />
+            <Download className="h-6 w-6" />
           </Button>
-          {showTools && (
-            <div className="absolute top-0 right-0 mt-8 p-2 bg-white shadow-lg rounded-md">
-              <Button
-                variant="ghost"
-                className="flex gap-2 w-full"
-                onClick={handleDownload}
-              >
-                <Download className="h-4 w-4" />
-                Download
-              </Button>
-              <Button
-                variant="ghost"
-                className="flex gap-2 w-full"
-                onClick={handleCopyToClipboard}
-              >
-                <ClipboardCopy className="h-4 w-4" />
-                Copy to Clipboard
-              </Button>
-            </div>
-          )}
+          <Button
+            className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
+            onClick={handleCopyToClipboard}
+          >
+            <ClipboardCopy className="h-6 w-6" />
+          </Button>
         </div>
       </CardContent>
     </Card>
