@@ -26,6 +26,11 @@ type ImageData = {
   catalogue: string[];
   under_review: boolean;
   timestamp: string;
+  uploader: {
+    nickname: string;
+    id: string;
+    platform: string;
+  };
 };
 
 type ImageCardProps = {
@@ -155,6 +160,9 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                   </div>
                 )}
                 <div className="mt-2 text-xs text-gray-300">
+                  上传者: {image.uploader.nickname} ({image.uploader.id})
+                </div>
+                <div className="mt-2 text-xs text-gray-300">
                   上传时间: {new Date(image.timestamp).toLocaleString()}
                 </div>
               </motion.div>
@@ -199,6 +207,9 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                     </ul>
                   </div>
                 )}
+                <div className="mt-2 text-xs text-gray-300">
+                  上传者: {image.uploader.nickname} ({image.uploader.id})
+                </div>
                 <div className="mt-2 text-xs text-gray-300">
                   上传时间: {new Date(image.timestamp).toLocaleString()}
                 </div>

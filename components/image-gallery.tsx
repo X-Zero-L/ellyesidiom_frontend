@@ -17,6 +17,11 @@ type ImageData = {
   catalogue: string[]
   under_review: boolean
   timestamp: string
+  uploader: {
+    nickname: string;
+    id: string;
+    platform: string;
+  }
 }
 
 export default function ImageGallery() {
