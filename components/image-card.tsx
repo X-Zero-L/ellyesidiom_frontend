@@ -158,6 +158,51 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                   上传时间: {new Date(image.timestamp).toLocaleString()}
                 </div>
               </motion.div>
+              <div className="block md:hidden p-4 text-white bg-black bg-opacity-60">
+                {image.tags.length > 0 && (
+                  <div className="mb-2">
+                    <h3 className="text-sm font-semibold mb-1">Tags:</h3>
+                    <div className="flex flex-wrap gap-1">
+                      {image.tags.map((tag, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="bg-white/20"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {image.comment.length > 0 && (
+                  <div className="mb-2">
+                    <h3 className="text-sm font-semibold mb-1">Comments:</h3>
+                    <ul className="list-disc list-inside">
+                      {image.comment.map((comment, index) => (
+                        <li key={index} className="text-sm">
+                          {comment}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {image.catalogue.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold mb-1">Catalogue:</h3>
+                    <ul className="list-disc list-inside">
+                      {image.catalogue.map((item, index) => (
+                        <li key={index} className="text-sm">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="mt-2 text-xs text-gray-300">
+                  上传时间: {new Date(image.timestamp).toLocaleString()}
+                </div>
+              </div>
             </div>
           </PhotoView>
         </PhotoProvider>
