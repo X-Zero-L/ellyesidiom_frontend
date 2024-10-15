@@ -44,19 +44,19 @@ export default function ImageGallery() {
   }
 
   useEffect(() => {
-    fetchImages(`${process.env.NEXT_PUBLIC_API_URL}/api/index`)
+    fetchImages('/api/index')
   }, [])
-
+  
   const handleSearch = () => {
     if (searchKeyword.trim()) {
       setCurrentPage('search')
-      fetchImages(`${process.env.NEXT_PUBLIC_API_URL}/api/search?keyword=${encodeURIComponent(searchKeyword)}`)
+      fetchImages(`/api/search?keyword=${encodeURIComponent(searchKeyword)}`)
     }
   }
-
+  
   const handleRandom = () => {
     setCurrentPage('random')
-    fetchImages(`${process.env.NEXT_PUBLIC_API_URL}/api/random?count=${randomCount}`)
+    fetchImages(`/api/random?count=${randomCount}`)
   }
 
   const handleImageClick = (imageUrl: string) => {
