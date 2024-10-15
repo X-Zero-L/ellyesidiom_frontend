@@ -16,6 +16,7 @@ type ImageData = {
   comment: string[]
   catalogue: string[]
   under_review: boolean
+  timestamp: string
 }
 
 export default function ImageGallery() {

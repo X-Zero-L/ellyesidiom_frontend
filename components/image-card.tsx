@@ -25,6 +25,7 @@ type ImageData = {
   comment: string[];
   catalogue: string[];
   under_review: boolean;
+  timestamp: string;
 };
 
 type ImageCardProps = {
@@ -153,6 +154,9 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                     </ul>
                   </div>
                 )}
+                <div className="mt-2 text-xs text-gray-300">
+                  上传时间: {new Date(image.timestamp).toLocaleString()}
+                </div>
               </motion.div>
             </div>
           </PhotoView>
