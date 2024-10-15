@@ -65,6 +65,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
 
   const handleCopyToClipboard = async () => {
     try {
+      /*
       const response = await fetch("/api/download", {
         method: "POST",
         headers: {
@@ -77,6 +78,14 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
       const blob = await (
         await fetch(`data:image/png;base64,${base64}`)
       ).blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob,
+        }),
+      ]);*/
+      // 复制图片的二进制数据
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
       await navigator.clipboard.write([
         new ClipboardItem({
           [blob.type]: blob,
