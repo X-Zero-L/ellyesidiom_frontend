@@ -138,7 +138,7 @@ export default function ImageGallery() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="mb-4 break-inside-avoid"
             >
-              <ImageCard image={image} onImageClick={handleImageClick} />
+              <ImageCard image={image} />
             </motion.div>
           ))}
         </motion.div>

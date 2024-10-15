@@ -35,10 +35,9 @@ type ImageData = {
 
 type ImageCardProps = {
   image: ImageData;
-  onImageClick: (imageUrl: string) => void;
 };
 
-export default function ImageCard({ image, onImageClick }: ImageCardProps) {
+export default function ImageCard({ image }: ImageCardProps) {
   const { toast } = useToast();
   const [showTools, setShowTools] = useState(false);
   const imageUrl = image.image_url;
@@ -104,9 +103,9 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
       // onClick={() => onImageClick(image.image_url)}
     >
       <CardContent className="p-0 relative">
-        <PhotoProvider>
-          <PhotoView src={image.image_url}>
-            <div>
+        <div>
+          <PhotoProvider>
+            <PhotoView src={image.image_url}>
               <img
                 src={image.image_url}
                 alt="Gallery Image"
@@ -114,61 +113,61 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                 height={300}
                 className="object-cover"
               />
-              <div className="block p-4 text-white bg-black bg-opacity-60">
-                {image.tags.length > 0 && (
-                  <div className="mb-2">
-                    <h3 className="text-sm font-semibold mb-1">Tags:</h3>
-                    <div className="flex flex-wrap gap-1">
-                      {image.tags.map((tag, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="bg-white/20"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {image.comment.length > 0 && (
-                  <div className="mb-2">
-                    <h3 className="text-sm font-semibold mb-1">备注：</h3>
-                    <ul className="list-disc list-inside">
-                      {image.comment.map((comment, index) => (
-                        <li key={index} className="text-sm">
-                          {comment}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {image.catalogue.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold mb-1">战犯：</h3>
-                    <ul className="list-disc list-inside">
-                      {image.catalogue.map((item, index) => (
-                        <li key={index} className="text-sm">
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {image.uploader.nickname !== "UNK" ? (
-                  <div className="mt-2 text-xs text-gray-300">
-                    上传者: {image.uploader.nickname} ({image.uploader.id})
-                  </div>
-                ) : (
-                  <div className="mt-2 text-xs text-gray-300">管理员上传</div>
-                )}
-                <div className="mt-2 text-xs text-gray-300">
-                  上传时间: {new Date(image.timestamp).toLocaleString()}
+            </PhotoView>
+          </PhotoProvider>
+          <div className="block p-4 text-white bg-black bg-opacity-60">
+            {image.tags.length > 0 && (
+              <div className="mb-2">
+                <h3 className="text-sm font-semibold mb-1">Tags:</h3>
+                <div className="flex flex-wrap gap-1">
+                  {image.tags.map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-white/20"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
                 </div>
               </div>
+            )}
+            {image.comment.length > 0 && (
+              <div className="mb-2">
+                <h3 className="text-sm font-semibold mb-1">备注：</h3>
+                <ul className="list-disc list-inside">
+                  {image.comment.map((comment, index) => (
+                    <li key={index} className="text-sm">
+                      {comment}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {image.catalogue.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold mb-1">战犯：</h3>
+                <ul className="list-disc list-inside">
+                  {image.catalogue.map((item, index) => (
+                    <li key={index} className="text-sm">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {image.uploader.nickname !== "UNK" ? (
+              <div className="mt-2 text-xs text-gray-300">
+                上传者: {image.uploader.nickname} ({image.uploader.id})
+              </div>
+            ) : (
+              <div className="mt-2 text-xs text-gray-300">管理员上传</div>
+            )}
+            <div className="mt-2 text-xs text-gray-300">
+              上传时间: {new Date(image.timestamp).toLocaleString()}
             </div>
-          </PhotoView>
-        </PhotoProvider>
+          </div>
+        </div>
         <div className="absolute top-2 right-2 flex gap-2">
           <Button
             className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
