@@ -59,7 +59,7 @@ export default function ImageGallery() {
   const handleSearch = () => {
     if (searchKeyword.trim()) {
       setCurrentPage('search')
-      fetchImages(`/api/search}`, { keyword: searchKeyword }
+      fetchImages(`/api/search`, { keyword: searchKeyword }
       )
     }
   }
