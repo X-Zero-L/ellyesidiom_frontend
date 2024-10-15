@@ -114,28 +114,6 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                 height={300}
                 className="object-cover"
               />
-              <motion.div
-                className="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-end p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-              >
-                {image.tags.length > 0 && (
-                  <div className="mb-2">
-                    <h3 className="text-sm font-semibold mb-1">Tags:</h3>
-                    <div className="flex flex-wrap gap-1">
-                      {image.tags.map((tag, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="bg-white/20"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
               <div className="block p-4 text-white bg-black bg-opacity-60">
                 {image.tags.length > 0 && (
                   <div className="mb-2">
