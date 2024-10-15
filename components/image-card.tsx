@@ -24,6 +24,7 @@ type ImageData = {
   image_url: string;
   comment: string[];
   catalogue: string[];
+  under_review: boolean;
 };
 
 type ImageCardProps = {
@@ -170,6 +171,11 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
             <ClipboardCopy className="h-6 w-6" />
           </Button>
         </div>
+        {image.under_review && (
+          <div className="absolute bottom-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+            未审查
+          </div>
+        )}
       </CardContent>
     </Card>
   );
