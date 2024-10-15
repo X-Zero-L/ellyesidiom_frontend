@@ -101,12 +101,11 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
         <PhotoProvider>
           <PhotoView src={image.image_url}>
             <div>
-              <Image
+              <img
                 src={image.image_url}
                 alt="Gallery Image"
                 width={500}
                 height={300}
-                layout="responsive"
                 className="object-cover"
               />
               <motion.div
