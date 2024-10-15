@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     const { url } = await request.json()
-    if (!url.match(/ap-shanghai.myqcloud.com/) && !url.match(/maxng.cc/)) {
+    if (!url.match(/ap-shanghai.myqcloud.com/) && !url.match(/maxng.cc/) && !url.match(/ei-images.hypermax.app/)) {
         return NextResponse.error()
     }
     const image = await fetch(url)
