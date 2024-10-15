@@ -25,11 +25,20 @@ export default function ImageGallery() {
   const [randomCount, setRandomCount] = useState('5')
   const [currentPage, setCurrentPage] = useState<'index' | 'search' | 'random'>('index')
 
-  const fetchImages = async (url: string) => {
+  const fetchImages = async (url: string,
+    payload: { keyword: string } | { count: number } | null = null
+  ) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(url)
+      //const response = await fetch(url)
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
       if (!response.ok) {
         throw new Error('Failed to fetch images')
       }
@@ -50,13 +59,14 @@ export default function ImageGallery() {
   const handleSearch = () => {
     if (searchKeyword.trim()) {
       setCurrentPage('search')
-      fetchImages(`/api/search?keyword=${encodeURIComponent(searchKeyword)}`)
+      fetchImages(`/api/search}`, { keyword: searchKeyword }
+      )
     }
   }
   
   const handleRandom = () => {
     setCurrentPage('random')
-    fetchImages(`/api/random?count=${randomCount}`)
+    fetchImages(`/api/random?count=${randomCount}`, { count: parseInt(randomCount) })
   }
 
   const handleImageClick = (imageUrl: string) => {
