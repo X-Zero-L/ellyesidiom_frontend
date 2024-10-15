@@ -51,6 +51,10 @@ export default function ImageGallery() {
         throw new Error('Failed to fetch images')
       }
       const data = await response.json()
+      // {"status":"no result"}
+      if (data.status === 'no result') {
+        setError('No result found for the search keyword, please try another one.')
+      }
       setImages(data.data)
     } catch (err) {
       setError('An error occurred while fetching images. Please try again.')
