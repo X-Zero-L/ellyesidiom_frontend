@@ -137,7 +137,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                 )}
                 {image.comment.length > 0 && (
                   <div className="mb-2">
-                    <h3 className="text-sm font-semibold mb-1">Comments:</h3>
+                    <h3 className="text-sm font-semibold mb-1">备注：</h3>
                     <ul className="list-disc list-inside">
                       {image.comment.map((comment, index) => (
                         <li key={index} className="text-sm">
@@ -149,7 +149,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                 )}
                 {image.catalogue.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold mb-1">Catalogue:</h3>
+                    <h3 className="text-sm font-semibold mb-1">战犯：</h3>
                     <ul className="list-disc list-inside">
                       {image.catalogue.map((item, index) => (
                         <li key={index} className="text-sm">
@@ -189,7 +189,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                 )}
                 {image.comment.length > 0 && (
                   <div className="mb-2">
-                    <h3 className="text-sm font-semibold mb-1">Comments:</h3>
+                    <h3 className="text-sm font-semibold mb-1">备注：</h3>
                     <ul className="list-disc list-inside">
                       {image.comment.map((comment, index) => (
                         <li key={index} className="text-sm">
@@ -201,7 +201,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                 )}
                 {image.catalogue.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold mb-1">Catalogue:</h3>
+                    <h3 className="text-sm font-semibold mb-1">战犯：</h3>
                     <ul className="list-disc list-inside">
                       {image.catalogue.map((item, index) => (
                         <li key={index} className="text-sm">
