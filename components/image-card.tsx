@@ -106,13 +106,13 @@ export default function ImageCard({ image }: ImageCardProps) {
         <div>
           <PhotoProvider>
             <PhotoView src={image.image_url}>
-              <img
-                src={image.image_url}
-                alt="Gallery Image"
-                width={500}
-                height={300}
-                className="object-cover"
-              />
+                <img
+                  src={image.image_url}
+                  alt="Gallery Image"
+                  width={500}
+                  height={300}
+                  className="object-cover bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
+                />
             </PhotoView>
           </PhotoProvider>
           <div className="block p-4 text-white bg-black bg-opacity-60">
