@@ -36,7 +36,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
   const [showTools, setShowTools] = useState(false);
   const imageUrl = image.image_url;
   const handleDownload = async () => {
-    try {/*
+    try {
       const response = await fetch("/api/download", {
         method: "POST",
         headers: {
@@ -53,11 +53,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
       const link = document.createElement("a");
       link.href = url;
       link.download = "image.png";
-      link.click();*/
-      const a_tag = document.createElement('a');
-      a_tag.href = imageUrl;
-      a_tag.download = imageUrl.split('/').pop() || 'default_image_name.png';
-      a_tag.click();
+      link.click();
     } catch (error) {
       console.error("Download failed:", error);
     }
@@ -65,7 +61,6 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
 
   const handleCopyToClipboard = async () => {
     try {
-      /*
       const response = await fetch("/api/download", {
         method: "POST",
         headers: {
@@ -78,14 +73,6 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
       const blob = await (
         await fetch(`data:image/png;base64,${base64}`)
       ).blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob,
-        }),
-      ]);*/
-      // 复制图片的二进制数据
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
       await navigator.clipboard.write([
         new ClipboardItem({
           [blob.type]: blob,
