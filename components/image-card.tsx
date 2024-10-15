@@ -159,9 +159,13 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                     </ul>
                   </div>
                 )}
-                <div className="mt-2 text-xs text-gray-300">
-                  上传者: {image.uploader.nickname} ({image.uploader.id})
-                </div>
+                {image.uploader.nickname !== "UNK" ? (
+                  <div className="mt-2 text-xs text-gray-300">
+                    上传者: {image.uploader.nickname} ({image.uploader.id})
+                  </div>
+                ) : (
+                  <div className="mt-2 text-xs text-gray-300">管理员上传</div>
+                )}
                 <div className="mt-2 text-xs text-gray-300">
                   上传时间: {new Date(image.timestamp).toLocaleString()}
                 </div>
@@ -207,9 +211,13 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                     </ul>
                   </div>
                 )}
-                <div className="mt-2 text-xs text-gray-300">
-                  上传者: {image.uploader.nickname} ({image.uploader.id})
-                </div>
+                {image.uploader.nickname !== "UNK" ? (
+                  <div className="mt-2 text-xs text-gray-300">
+                    上传者: {image.uploader.nickname} ({image.uploader.id})
+                  </div>
+                ) : (
+                  <div className="mt-2 text-xs text-gray-300">管理员上传</div>
+                )}
                 <div className="mt-2 text-xs text-gray-300">
                   上传时间: {new Date(image.timestamp).toLocaleString()}
                 </div>
