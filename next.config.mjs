@@ -14,6 +14,12 @@ const nextConfig = {
             hostname: '*hypermax.app',
             port: '',
             pathname: '/**',
+          },
+          {
+            protocol: "http",
+            hostname: "*maxng.cc",
+            port: "3889",
+            pathname: "/**",
           }
         ],
       },
