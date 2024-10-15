@@ -36,7 +36,7 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
   const [showTools, setShowTools] = useState(false);
   const imageUrl = image.image_url;
   const handleDownload = async () => {
-    try {
+    try {/*
       const response = await fetch("/api/download", {
         method: "POST",
         headers: {
@@ -53,7 +53,11 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
       const link = document.createElement("a");
       link.href = url;
       link.download = "image.png";
-      link.click();
+      link.click();*/
+      const a_tag = document.createElement('a');
+      a_tag.href = imageUrl;
+      a_tag.download = imageUrl.split('/').pop() || 'default_image_name.png';
+      a_tag.click();
     } catch (error) {
       console.error("Download failed:", error);
     }
