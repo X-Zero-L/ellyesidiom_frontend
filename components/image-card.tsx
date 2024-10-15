@@ -79,15 +79,15 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
         }),
       ]);
       toast({
-        title: "Image copied to clipboard",
+        title: "图片已复制到剪贴板",
         description:
-          "You can now paste the image directly into QQ or other applications.",
+          "快粘贴到EP群里分享给大家吧！",
       });
     } catch (error) {
       console.error("Copy to clipboard failed:", error);
       toast({
-        title: "Copy to clipboard failed",
-        description: "An error occurred while copying the image to clipboard.",
+        title: "图片复制失败",
+        description: "请重试",
         variant: "destructive",
       });
     }
