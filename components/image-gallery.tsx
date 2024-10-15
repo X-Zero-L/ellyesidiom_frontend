@@ -15,6 +15,7 @@ type ImageData = {
   image_url: string
   comment: string[]
   catalogue: string[]
+  under_review: boolean
 }
 
 export default function ImageGallery() {
