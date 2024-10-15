@@ -135,42 +135,8 @@ export default function ImageCard({ image, onImageClick }: ImageCardProps) {
                     </div>
                   </div>
                 )}
-                {image.comment.length > 0 && (
-                  <div className="mb-2">
-                    <h3 className="text-sm font-semibold mb-1">备注：</h3>
-                    <ul className="list-disc list-inside">
-                      {image.comment.map((comment, index) => (
-                        <li key={index} className="text-sm">
-                          {comment}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {image.catalogue.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold mb-1">战犯：</h3>
-                    <ul className="list-disc list-inside">
-                      {image.catalogue.map((item, index) => (
-                        <li key={index} className="text-sm">
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {image.uploader.nickname !== "UNK" ? (
-                  <div className="mt-2 text-xs text-gray-300">
-                    上传者: {image.uploader.nickname} ({image.uploader.id})
-                  </div>
-                ) : (
-                  <div className="mt-2 text-xs text-gray-300">管理员上传</div>
-                )}
-                <div className="mt-2 text-xs text-gray-300">
-                  上传时间: {new Date(image.timestamp).toLocaleString()}
-                </div>
               </motion.div>
-              <div className="block md:hidden p-4 text-white bg-black bg-opacity-60">
+              <div className="block p-4 text-white bg-black bg-opacity-60">
                 {image.tags.length > 0 && (
                   <div className="mb-2">
                     <h3 className="text-sm font-semibold mb-1">Tags:</h3>
