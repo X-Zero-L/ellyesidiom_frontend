@@ -16,6 +16,9 @@ import {
   Search,
   Shuffle,
   Info,
+  Copy,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -53,6 +56,13 @@ type ImageData = {
   timestamp: string;
 };
 
+type DuplicateImage = {
+  duplicate_idiom_hash: string;
+  duplicate_idiom_ext: string;
+  score: number;
+  score_threshold: number;
+};
+
 export default function AdminReview() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,8 +73,12 @@ export default function AdminReview() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [isUnderReview, setIsUnderReview] = useState(true);
   const [limit, setLimit] = useState("100");
+  const [duplicates, setDuplicates] = useState<DuplicateImage[]>([]);
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   const [needFetchUpdatedImageInfo, setNeedFetchUpdatedImageInfo] =
     useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const duplicatesPerPage = 9;
   const [catalogueData, setCatalogueData] = useState<{
     [key: string]: string[];
   }>({});
@@ -146,7 +160,21 @@ export default function AdminReview() {
       setLoading(false);
     }
   };
+  const indexOfLastDuplicate = currentPage * duplicatesPerPage;
+  const indexOfFirstDuplicate = indexOfLastDuplicate - duplicatesPerPage;
+  const currentDuplicates = duplicates.slice(
+    indexOfFirstDuplicate,
+    indexOfLastDuplicate
+  );
+  const totalPages = Math.ceil(duplicates.length / duplicatesPerPage);
 
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
   useEffect(() => {
     fetchImages();
     fetchCatalogueData();
@@ -279,6 +307,36 @@ export default function AdminReview() {
     setEditingImage(null);
   };
 
+  const handleCheckDuplicates = async (imageHash: string) => {
+    setCheckingDuplicates(true);
+    try {
+      const response = await fetch(
+        `/api/admin/dedup/check?image_hash=${imageHash}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data.dedup_list.length === 0) {
+          toast({
+            title: "无重复",
+            description: "没有发现重复图片。",
+          });
+        }
+        setDuplicates(data.data.dedup_list || []);
+      } else {
+        throw new Error("Failed to check duplicates");
+      }
+    } catch (error) {
+      console.error("Error checking duplicates:", error);
+      toast({
+        title: "Error",
+        description: "Failed to check duplicates. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setCheckingDuplicates(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -395,6 +453,11 @@ export default function AdminReview() {
                   <DropdownMenuItem onClick={() => handleEditCatalogue(image)}>
                     <List className="w-4 h-4 mr-2" /> 编辑怡批
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleCheckDuplicates(image.image_hash)}
+                  >
+                    <Shuffle className="w-4 h-4 mr-2" /> 查重
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setSelectedImage(image)}>
                     <Info className="w-4 h-4 mr-2" /> 详情
                   </DropdownMenuItem>
@@ -436,6 +499,95 @@ export default function AdminReview() {
               <h3 className="font-semibold">评论:</h3>
               <p>{selectedImage?.comment.join(", ") || "无评论"}</p>
             </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      {checkingDuplicates && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      )}
+      {duplicates.length > 0 && (
+        <Dialog
+          open={duplicates.length > 0}
+          onOpenChange={() => setDuplicates([])}
+        >
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>重复图片检查结果</DialogTitle>
+            </DialogHeader>
+            {checkingDuplicates ? (
+              <div className="flex justify-center items-center h-40">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              </div>
+            ) : duplicates.length === 0 ? (
+              <p>没有发现重复图片。</p>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {currentDuplicates.map((duplicate) => (
+                    <div
+                      key={duplicate.duplicate_idiom_hash}
+                      className="border rounded p-2"
+                    >
+                      <Card className="overflow-hidden">
+                        <CardContent className="p-0">
+                          <div className="relative aspect-video">
+                            <PhotoProvider>
+                              <PhotoView
+                                src={`https://ei-images.hypermax.app/${duplicate.duplicate_idiom_hash}.${duplicate.duplicate_idiom_ext}`}
+                              >
+                                <Image
+                                  src={`https://ei-images.hypermax.app/${duplicate.duplicate_idiom_hash}.${duplicate.duplicate_idiom_ext}`}
+                                  alt="Duplicate image"
+                                  layout="fill"
+                                  objectFit="cover"
+                                  className="bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
+                                />
+                              </PhotoView>
+                            </PhotoProvider>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <p className="text-sm mt-2">
+                        哈希: {duplicate.duplicate_idiom_hash}
+                      </p>
+                      <p className="text-sm mt-2">
+                        重复度: {duplicate.score}/{duplicate.score_threshold}
+                      </p>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="mt-2 w-full"
+                      >
+                        删除重复
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <Button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-2" /> 上一页
+                  </Button>
+                  <span>
+                    第 {currentPage} 页，共 {totalPages} 页
+                  </span>
+                  <Button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    variant="outline"
+                    size="sm"
+                  >
+                    下一页 <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </>
+            )}
           </DialogContent>
         </Dialog>
       )}
