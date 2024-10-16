@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-const CORRECT_PASSWORD = process.env.EI_API_KEY!!
+const CORRECT_PASSWORD = process.env.EI_API_KEY
 
 export async function POST(request: Request) {
   const { password } = await request.json()
 
-  if (password === CORRECT_PASSWORD) {
+  if (password === CORRECT_PASSWORD && CORRECT_PASSWORD) {
     cookies().set('adminToken', CORRECT_PASSWORD, {
         maxAge: 60 * 60 * 24 * 7,
     })
