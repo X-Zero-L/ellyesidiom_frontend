@@ -54,7 +54,11 @@ export default function AdminReview() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [isUnderReview, setIsUnderReview] = useState(true);
   const [limit, setLimit] = useState("100");
-  const [catalogueData, setCatalogueData] = useState<{ [key: string]: string[] }>({});
+  const [needFetchUpdatedImageInfo, setNeedFetchUpdatedImageInfo] =
+    useState(false);
+  const [catalogueData, setCatalogueData] = useState<{
+    [key: string]: string[];
+  }>({});
   const fetchCatalogueData = async () => {
     try {
       const response = await fetch("/api/admin/cats");
@@ -110,7 +114,8 @@ export default function AdminReview() {
         if (data.data.length === 0 || Object.keys(data.data).length === 0) {
           toast({
             title: "Error",
-            description: "No result found for the search keyword, please try another one.",
+            description:
+              "No result found for the search keyword, please try another one.",
             variant: "destructive",
           });
           return;
@@ -189,7 +194,9 @@ export default function AdminReview() {
     // 改为更新对应图片的 under_review 字段
     setImages((prevImages) =>
       prevImages.map((image) =>
-        image.image_hash === imageHash ? { ...image, under_review: false } : image
+        image.image_hash === imageHash
+          ? { ...image, under_review: false }
+          : image
       )
     );
   };
@@ -221,7 +228,9 @@ export default function AdminReview() {
     });
     setImages((prevImages) =>
       prevImages.map((image) =>
-        image.image_hash === imageHash ? { ...image, under_review: true } : image
+        image.image_hash === imageHash
+          ? { ...image, under_review: true }
+          : image
       )
     );
   };
@@ -231,28 +240,32 @@ export default function AdminReview() {
   };
 
   const handleCloseEditDialog = async () => {
-    try {
-      if (editingImage) {
-        const response = await fetch(
-          `/api/admin/image_info?image_hash=${editingImage.image_hash}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch image info");
+    if (needFetchUpdatedImageInfo) {
+      try {
+        if (editingImage) {
+          const response = await fetch(
+            `/api/admin/image_info?image_hash=${editingImage.image_hash}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch image info");
+          }
+          const data = await response.json();
+          setImages((prevImages) =>
+            prevImages.map((image) =>
+              image.image_hash === editingImage.image_hash ? data.data : image
+            )
+          );
         }
-        const data = await response.json();
-        setImages((prevImages) =>
-          prevImages.map((image) =>
-            image.image_hash === editingImage.image_hash ? data.data : image
-          )
-        );
+      } catch (error) {
+        console.error("Error updating image info:", error);
+        toast({
+          title: "Error",
+          description:
+            "Failed to update image info, because of error: " + error,
+          variant: "destructive",
+        });
       }
-    } catch (error) {
-      console.error("Error updating image info:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update image info, because of error: " + error,
-        variant: "destructive",
-      });
+      setNeedFetchUpdatedImageInfo(false);
     }
     setEditingImage(null);
   };
@@ -289,7 +302,8 @@ export default function AdminReview() {
             onClick={() => setIsUnderReview(!isUnderReview)}
             variant={isUnderReview ? "default" : "outline"}
           >
-            <Tag className="mr-2 h-4 w-4" /> {isUnderReview ? "未审核" : "已审核"}
+            <Tag className="mr-2 h-4 w-4" />{" "}
+            {isUnderReview ? "未审核" : "已审核"}
           </Button>
         </div>
       </div>
@@ -370,6 +384,7 @@ export default function AdminReview() {
           imageHash={editingImage.image_hash}
           currentCatalogue={editingImage.catalogue}
           catalogueData={catalogueData}
+          setNeedFetchUpdatedImageInfo={setNeedFetchUpdatedImageInfo}
         />
       )}
     </div>
