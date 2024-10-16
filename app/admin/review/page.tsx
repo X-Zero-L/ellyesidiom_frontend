@@ -191,7 +191,10 @@ export default function AdminReview() {
   };
   useEffect(() => {
     fetchImages(true).then((res) => {
-      if (res === -1) fetchImages(false, true);
+      if (res === -1) {
+        fetchImages(false, true);
+        setIsUnderReview(false);
+      }
     });
     fetchCatalogueData();
   }, [router, toast]);
