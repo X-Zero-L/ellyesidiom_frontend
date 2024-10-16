@@ -497,6 +497,13 @@ export default function AdminReview() {
                 >
                   <X className="w-4 h-4 mr-1" /> 删除
                 </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleCheckDuplicates(image.image_hash)}
+                >
+                  <Shuffle className="w-4 h-4 mr-1" /> 查重
+                </Button>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -515,11 +522,6 @@ export default function AdminReview() {
                     onClick={() => setEditingImageComment(image)}
                   >
                     <MessageCircle className="w-4 h-4 mr-2" /> 编辑评论
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleCheckDuplicates(image.image_hash)}
-                  >
-                    <Shuffle className="w-4 h-4 mr-2" /> 查重
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setSelectedImage(image)}>
                     <Info className="w-4 h-4 mr-2" /> 详情
