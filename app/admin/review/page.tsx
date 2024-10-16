@@ -6,7 +6,16 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Check, X, MoreHorizontal, Tag, List } from "lucide-react";
+import {
+  Loader2,
+  Check,
+  X,
+  MoreHorizontal,
+  Tag,
+  List,
+  Search,
+  Shuffle,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +26,14 @@ import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 import { Toaster } from "@/components/ui/toaster";
 import { EditCatalogueDialog } from "@/components/edit-cat-dialog";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@radix-ui/react-select";
+import { Input } from "@/components/ui/input";
 
 type ImageData = {
   tags: string[];
@@ -41,33 +58,64 @@ export default function AdminReview() {
   const [editingImage, setEditingImage] = useState<ImageData | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [isUnderReview, setIsUnderReview] = useState(true);
+  const [limit, setLimit] = useState("100");
+
+  const fetchImages = async (initialLoad = false) => {
+    try {
+      let payload: {
+        keyword?: string;
+        under_review?: boolean;
+        limit?: number;
+      } = {};
+      if (initialLoad) {
+        payload.under_review = true;
+      } else {
+        if (searchKeyword) {
+          payload.keyword = searchKeyword;
+        }
+        if (isUnderReview) {
+          payload.under_review = isUnderReview;
+        }
+        if (limit) {
+          payload.limit = parseInt(limit);
+        }
+      }
+      const response = await fetch("/api/admin/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setImages(data.data);
+      } else if (response.status === 401) {
+        router.push("/admin/login");
+      } else {
+        throw new Error("Failed to fetch images");
+      }
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const response = await fetch("/api/admin/review");
-        if (response.ok) {
-          const data = await response.json();
-          setImages(data.data);
-        } else if (response.status === 401) {
-          router.push("/admin/login");
-        } else {
-          throw new Error("Failed to fetch images");
-        }
-      } catch (error) {
-        console.error("Error fetching images:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch images. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchImages();
   }, [router, toast]);
+
+  const handleSearch = () => {
+    fetchImages();
+  };
 
   const handleLogout = async () => {
     try {
@@ -110,17 +158,47 @@ export default function AdminReview() {
       title: "通过！",
       description: `图片 ${imageHash} 已通过审核！`,
     });
-    setImages((prevImages) =>
+    /*setImages((prevImages) =>
       prevImages.filter((image) => image.image_hash !== imageHash)
+    );*/
+    // 改为更新对应图片的 under_review 字段
+    setImages((prevImages) =>
+      prevImages.map((image) =>
+        image.image_hash === imageHash ? { ...image, under_review: false } : image
+      )
     );
   };
 
   const handleReject = async (imageHash: string) => {
     console.log("Rejecting image:", imageHash);
-    toast({
+    /*toast({
       title: "不准删除！",
       description: `不准删除！`,
+    });*/
+    const response = await fetch("/api/admin/review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ image_hash: imageHash, under_review: true }),
     });
+    if (!response.ok || (await response.json()).message !== "ok") {
+      toast({
+        title: "Error",
+        description: "Failed to reject image. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "打回！",
+      description: `图片 ${imageHash} 已打回！`,
+    });
+    setImages((prevImages) =>
+      prevImages.map((image) =>
+        image.image_hash === imageHash ? { ...image, under_review: true } : image
+      )
+    );
   };
 
   const handleEditCatalogue = (image: ImageData) => {
@@ -165,8 +243,30 @@ export default function AdminReview() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">待审核图片</h1>
+        <h1 className="text-2xl font-bold">怡闻录管理</h1>
         <Button onClick={handleLogout}>登出</Button>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="flex-1 flex gap-2">
+          <Input
+            type="text"
+            placeholder="搜索关键词..."
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+          <Button onClick={handleSearch}>
+            <Search className="mr-2 h-4 w-4" /> 搜索
+          </Button>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setIsUnderReview(!isUnderReview)}
+            variant={isUnderReview ? "default" : "outline"}
+          >
+            <Tag className="mr-2 h-4 w-4" /> {isUnderReview ? "未审核" : "已审核"}
+          </Button>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {images.map((image) => (
@@ -208,6 +308,7 @@ export default function AdminReview() {
                   size="sm"
                   variant="outline"
                   onClick={() => handleApprove(image.image_hash)}
+                  disabled={!image.under_review}
                 >
                   <Check className="w-4 h-4 mr-1" /> 通过
                 </Button>
@@ -215,8 +316,9 @@ export default function AdminReview() {
                   size="sm"
                   variant="destructive"
                   onClick={() => handleReject(image.image_hash)}
+                  disabled={image.under_review}
                 >
-                  <X className="w-4 h-4 mr-1" /> 拒绝
+                  <X className="w-4 h-4 mr-1" /> 打回
                 </Button>
               </div>
               <DropdownMenu>
