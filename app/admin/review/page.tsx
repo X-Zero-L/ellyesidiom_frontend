@@ -336,18 +336,23 @@ export default function AdminReview() {
                 <p className="text-sm text-gray-600">
                   上传者: {image.uploader.nickname} ({image.uploader.platform})
                 </p>
-                <p className="text-sm text-gray-600">
-                  所属ep: {
-                    image.catalogue.map((cat) => {
-                      for (const [key, values] of Object.entries(catalogueData)) {
-                        if (key === cat) {
-                          return values[0]
+                {image.catalogue.length > 0 && (
+                  <p className="text-sm text-gray-600">
+                    所属ep:{" "}
+                    {image.catalogue
+                      .map((cat) => {
+                        for (const [key, values] of Object.entries(
+                          catalogueData
+                        )) {
+                          if (key === cat) {
+                            return values[0];
+                          }
                         }
-                      }
-                      return cat;
-                    }).join(", ")
-                  }
-                </p>
+                        return cat;
+                      })
+                      .join(", ")}
+                  </p>
+                )}
               </div>
             </CardContent>
             <CardFooter className="flex justify-between items-center">
