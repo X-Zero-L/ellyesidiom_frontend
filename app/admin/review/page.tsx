@@ -93,8 +93,7 @@ export default function AdminReview() {
       });
       if (response.ok) {
         const data = await response.json();
-        // 看data是不是空数组
-        if (data.data.length === 0) {
+        if (data.data.length === 0 || Object.keys(data.data).length === 0) {
           toast({
             title: "Error",
             description: "No result found for the search keyword, please try another one.",
