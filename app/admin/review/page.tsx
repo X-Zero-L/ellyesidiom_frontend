@@ -16,6 +16,7 @@ import {
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 import { Toaster } from "@/components/ui/toaster";
+import { EditCatalogueDialog } from "@/components/edit-cat-dialog";
 
 type ImageData = {
   tags: string[];
@@ -37,6 +38,7 @@ type ImageData = {
 export default function AdminReview() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingImage, setEditingImage] = useState<ImageData | null>(null);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -121,14 +123,35 @@ export default function AdminReview() {
     });
   };
 
-  const handleEdit = (imageHash: string) => {
-    // Implement edit logic here
-    console.log("Editing image:", imageHash);
-    // This would typically open a modal or navigate to an edit page
-    toast({
-      title: "Edit Image",
-      description: `Editing image ${imageHash}. This feature is not yet implemented.`,
-    });
+  const handleEditCatalogue = (image: ImageData) => {
+    setEditingImage(image);
+  };
+
+  const handleCloseEditDialog = async () => {
+    try {
+      if (editingImage) {
+        const response = await fetch(
+          `/api/admin/image_info?image_hash=${editingImage.image_hash}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch image info");
+        }
+        const data = await response.json();
+        setImages((prevImages) =>
+          prevImages.map((image) =>
+            image.image_hash === editingImage.image_hash ? data.data : image
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating image info:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update image info, because of error: " + error,
+        variant: "destructive",
+      });
+    }
+    setEditingImage(null);
   };
 
   if (loading) {
@@ -174,6 +197,9 @@ export default function AdminReview() {
                 <p className="text-sm text-gray-600">
                   上传者: {image.uploader.nickname} ({image.uploader.platform})
                 </p>
+                <p className="text-sm text-gray-600">
+                  目录: {image.catalogue.join(", ")}
+                </p>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between items-center">
@@ -200,23 +226,24 @@ export default function AdminReview() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => handleEdit(image.image_hash)}
-                  >
-                    <Tag className="w-4 h-4 mr-2" /> 编辑标签
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleEdit(image.image_hash)}
-                  >
-                    <List className="w-4 h-4 mr-2" /> 编辑目录
+                  <DropdownMenuItem onClick={() => handleEditCatalogue(image)}>
+                    <List className="w-4 h-4 mr-2" /> 编辑怡批
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </CardFooter>
           </Card>
         ))}
-        <Toaster />
       </div>
+      <Toaster />
+      {editingImage && (
+        <EditCatalogueDialog
+          isOpen={!!editingImage}
+          onClose={handleCloseEditDialog}
+          imageHash={editingImage.image_hash}
+          currentCatalogue={editingImage.catalogue}
+        />
+      )}
     </div>
   );
 }
