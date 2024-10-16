@@ -98,96 +98,93 @@ export default function ImageCard({ image }: ImageCardProps) {
     }
   };
   return (
-    <Card
-      className="overflow-hidden group cursor-pointer relative"
-      // onClick={() => onImageClick(image.image_url)}
-    >
-      <CardContent className="p-0 relative">
-        <div>
+    <div>
+      <Card
+        className="overflow-hidden"
+        // onClick={() => onImageClick(image.image_url)}
+      >
+        <CardContent className="p-0">
           <PhotoProvider>
             <PhotoView src={image.image_url}>
-                <img
-                  src={image.image_url}
-                  alt="Gallery Image"
-                  width={500}
-                  height={300}
-                  className="object-cover bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
-                />
+              <img
+                src={image.image_url}
+                alt="Gallery Image"
+                width={500}
+                height={300}
+                className="object-cover bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
+              />
             </PhotoView>
           </PhotoProvider>
-          <div className="block p-4 text-white bg-black bg-opacity-60">
-            {image.tags.length > 0 && (
-              <div className="mb-2">
-                <h3 className="text-sm font-semibold mb-1">Tags:</h3>
-                <div className="flex flex-wrap gap-1">
-                  {image.tags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-white/20"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-            {image.comment.length > 0 && (
-              <div className="mb-2">
-                <h3 className="text-sm font-semibold mb-1">备注：</h3>
-                <ul className="list-disc list-inside">
-                  {image.comment.map((comment, index) => (
-                    <li key={index} className="text-sm">
-                      {comment}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          <div className="p-4">
+            <p className="text-sm text-gray-500 mb-2">
+              {new Date(image.timestamp).toLocaleString()}
+            </p>
+            <p className="text-sm text-gray-600">
+              图片ID: {image.image_url.split("/").pop()}
+            </p>
+            {image.uploader.nickname !== "UNK" ? (
+              <p className="text-sm text-gray-600">
+                上传怡批: {image.uploader.nickname} ({image.uploader.id})
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600">管理员导入</p>
             )}
             {image.catalogue.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold mb-1">战犯：</h3>
-                <ul className="list-disc list-inside">
-                  {image.catalogue.map((item, index) => (
-                    <li key={index} className="text-sm">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <p className="text-sm text-gray-600 mt-auto">
+                所属怡批:
+                {image.catalogue.join(", ")}
+              </p>
             )}
-            {image.uploader.nickname !== "UNK" ? (
-              <div className="mt-2 text-xs text-gray-300">
-                上传者: {image.uploader.nickname} ({image.uploader.id})
-              </div>
-            ) : (
-              <div className="mt-2 text-xs text-gray-300">管理员上传</div>
-            )}
-            <div className="mt-2 text-xs text-gray-300">
-              上传时间: {new Date(image.timestamp).toLocaleString()}
+            <div className="absolute top-2 right-2 flex gap-2">
+              <Button
+                className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
+                onClick={handleDownload}
+              >
+                <Download className="h-6 w-6" />
+              </Button>
+              <Button
+                className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
+                onClick={handleCopyToClipboard}
+              >
+                <ClipboardCopy className="h-6 w-6" />
+              </Button>
+              {image.tags.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="text-sm font-semibold mb-1">Tags:</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {image.tags.map((tag, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-white/20"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {image.comment.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="text-sm font-semibold mb-1">评论：</h3>
+                  <ul className="list-disc list-inside">
+                    {image.comment.map((comment, index) => (
+                      <li key={index} className="text-sm">
+                        {comment}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
+            {image.under_review && (
+              <div className="absolute bottom-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                未审查
+              </div>
+            )}
           </div>
-        </div>
-        <div className="absolute top-2 right-2 flex gap-2">
-          <Button
-            className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
-            onClick={handleDownload}
-          >
-            <Download className="h-6 w-6" />
-          </Button>
-          <Button
-            className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
-            onClick={handleCopyToClipboard}
-          >
-            <ClipboardCopy className="h-6 w-6" />
-          </Button>
-        </div>
-        {image.under_review && (
-          <div className="absolute bottom-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
-            未审查
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
