@@ -309,8 +309,8 @@ export default function AdminReview() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {images.map((image) => (
-          <Card key={image.image_hash} className="overflow-hidden">
-            <CardContent className="p-0">
+          <Card key={image.image_hash} className="overflow-hidden flex flex-col h-full">
+            <CardContent className="p-0 flex-grow">
               <div className="relative aspect-video">
                 <PhotoProvider>
                   <PhotoView
@@ -337,7 +337,7 @@ export default function AdminReview() {
                   { image.uploader.nickname !== "UNK" ? `上传怡批: ${image.uploader.nickname} (${image.uploader.id})` : "管理员导入" }
                 </p>
                 {image.catalogue.length > 0 && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 mt-auto">
                     所属ep:{" "}
                     {image.catalogue
                       .map((cat) => {
