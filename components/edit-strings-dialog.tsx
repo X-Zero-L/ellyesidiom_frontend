@@ -93,6 +93,7 @@ export function EditStringListDialog({
               value={newString}
               onChange={(e) => setNewString(e.target.value)}
               placeholder={`输入新${displayString}...`}
+              onKeyDown={(e) => e.key === "Enter" && handleAddString()}
             />
             <Button onClick={handleAddString}>添加</Button>
           </div>
