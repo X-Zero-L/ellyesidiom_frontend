@@ -334,7 +334,7 @@ export default function AdminReview() {
                   {image.ocr_text.join(", ")}
                 </p>
                 <p className="text-sm text-gray-600">
-                  上传者: {image.uploader.nickname} ({image.uploader.platform})
+                  { image.uploader.nickname !== "UNK" ? `上传怡批: ${image.uploader.nickname} (${image.uploader.id})` : "管理员导入" }
                 </p>
                 {image.catalogue.length > 0 && (
                   <p className="text-sm text-gray-600">
