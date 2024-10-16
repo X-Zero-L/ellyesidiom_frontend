@@ -64,7 +64,7 @@ export default function AdminReview() {
 
   const fetchImages = async (initialLoad = false) => {
     try {
-      let payload: {
+      const payload: {
         keyword?: string;
         under_review?: boolean;
         limit?: number;
