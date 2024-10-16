@@ -77,6 +77,8 @@ export default function AdminReview() {
         }
         if (isUnderReview) {
           payload.under_review = isUnderReview;
+        } else {
+          payload.under_review = false;
         }
         if (limit) {
           payload.limit = parseInt(limit);
