@@ -19,6 +19,7 @@ import {
   Copy,
   ChevronLeft,
   ChevronRight,
+  MessageCircle,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,6 +31,7 @@ import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 import { Toaster } from "@/components/ui/toaster";
 import { EditCatalogueDialog } from "@/components/edit-cat-dialog";
+import { EditStringListDialog } from "@/components/edit-strings-dialog";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -68,6 +70,11 @@ export default function AdminReview() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingImage, setEditingImage] = useState<ImageData | null>(null);
+  const [editingImageTags, setEditingImageTags] = useState<ImageData | null>(
+    null
+  );
+  const [editingImageComment, setEditingImageComment] =
+    useState<ImageData | null>(null);
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const router = useRouter();
   const { toast } = useToast();
@@ -300,35 +307,49 @@ export default function AdminReview() {
     setEditingImage(image);
   };
 
-  const handleCloseEditDialog = async () => {
-    if (needFetchUpdatedImageInfo) {
-      try {
-        if (editingImage) {
-          const response = await fetch(
-            `/api/admin/image_info?image_hash=${editingImage.image_hash}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch image info");
-          }
-          const data = await response.json();
-          setImages((prevImages) =>
-            prevImages.map((image) =>
-              image.image_hash === editingImage.image_hash ? data.data : image
-            )
-          );
-        }
-      } catch (error) {
-        console.error("Error updating image info:", error);
-        toast({
-          title: "Error",
-          description:
-            "Failed to update image info, because of error: " + error,
-          variant: "destructive",
-        });
+  const fetchImageInfo = async (imageHash: string) => {
+    try {
+      const response = await fetch(
+        `/api/admin/image_info?image_hash=${imageHash}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch image info");
       }
-      setNeedFetchUpdatedImageInfo(false);
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching image info:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch image info. Please try again.",
+        variant: "destructive",
+      });
     }
+  };
+
+  const fetchAndSetImageInfo = async (imageHash: string) => {
+    const updatedImageInfo = await fetchImageInfo(imageHash);
+    if (updatedImageInfo) {
+      setImages((prevImages) =>
+        prevImages.map((image) =>
+          image.image_hash === imageHash
+            ? { ...image, ...updatedImageInfo }
+            : image
+        )
+      );
+    }
+  };
+
+  const handleCloseEditDialog = async () => {
     setEditingImage(null);
+  };
+
+  const handleCloseTagDialog = async () => {
+    setEditingImageTags(null);
+  };
+
+  const handleCloseCommentDialog = async () => {
+    setEditingImageComment(null);
   };
 
   const handleCheckDuplicates = async (imageHash: string) => {
@@ -487,6 +508,14 @@ export default function AdminReview() {
                   <DropdownMenuItem onClick={() => handleEditCatalogue(image)}>
                     <List className="w-4 h-4 mr-2" /> 编辑怡批
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setEditingImageTags(image)}>
+                    <Tag className="w-4 h-4 mr-2" /> 编辑标签
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setEditingImageComment(image)}
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" /> 编辑评论
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleCheckDuplicates(image.image_hash)}
                   >
@@ -510,6 +539,29 @@ export default function AdminReview() {
           currentCatalogue={editingImage.catalogue}
           catalogueData={catalogueData}
           setNeedFetchUpdatedImageInfo={setNeedFetchUpdatedImageInfo}
+          onUpdate={fetchAndSetImageInfo}
+        />
+      )}
+      {editingImageTags && (
+        <EditStringListDialog
+          isOpen={!!editingImageTags}
+          onClose={handleCloseTagDialog}
+          imageHash={editingImageTags.image_hash}
+          displayString="tags"
+          currentStrings={editingImageTags.tags}
+          setNeedFetchUpdatedImageInfo={setNeedFetchUpdatedImageInfo}
+          onUpdate={fetchAndSetImageInfo}
+        />
+      )}
+      {editingImageComment && (
+        <EditStringListDialog
+          isOpen={!!editingImageComment}
+          onClose={handleCloseCommentDialog}
+          imageHash={editingImageComment.image_hash}
+          displayString="comment"
+          currentStrings={editingImageComment.comment}
+          setNeedFetchUpdatedImageInfo={setNeedFetchUpdatedImageInfo}
+          onUpdate={fetchAndSetImageInfo}
         />
       )}
       {selectedImage && (

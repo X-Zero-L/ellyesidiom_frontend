@@ -24,6 +24,7 @@ type EditCatalogueDialogProps = {
   currentCatalogue: string[];
   catalogueData: CatalogueData;
   setNeedFetchUpdatedImageInfo: (value: boolean) => void;
+  onUpdate: (value: string) => void;
 };
 
 export function EditCatalogueDialog({
@@ -33,6 +34,7 @@ export function EditCatalogueDialog({
   currentCatalogue,
   catalogueData,
   setNeedFetchUpdatedImageInfo,
+  onUpdate,
 }: EditCatalogueDialogProps) {
   const [selectedCatalogue, setSelectedCatalogue] =
     useState<string[]>(currentCatalogue);
@@ -57,7 +59,7 @@ export function EditCatalogueDialog({
           title: "成功",
           description: `已更新${imageHash}所属的怡批`,
         });
-        setNeedFetchUpdatedImageInfo(true);
+        onUpdate(imageHash);
         onClose();
       } else {
         throw new Error("Failed to update catalogue");
