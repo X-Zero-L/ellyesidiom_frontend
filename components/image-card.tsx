@@ -120,7 +120,7 @@ export default function ImageCard({ image }: ImageCardProps) {
               {new Date(image.timestamp).toLocaleString()}
             </p>
             <p className="text-sm text-gray-600">
-              图片ID: {image.image_url.split("/").pop()}
+              图片ID: {image.image_url.split("/").pop()?.split(".")[0]}
             </p>
             {image.uploader.nickname !== "UNK" ? (
               <p className="text-sm text-gray-600">
