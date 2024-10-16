@@ -34,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -82,6 +83,9 @@ export default function AdminReview() {
   const [catalogueData, setCatalogueData] = useState<{
     [key: string]: string[];
   }>({});
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  const [needUpdatedDuplicates, setNeedUpdatedDuplicates] = useState(false);
+
   const fetchCatalogueData = async () => {
     try {
       const response = await fetch("/api/admin/cats");
@@ -290,7 +294,7 @@ export default function AdminReview() {
     setImages((prevImages) =>
       prevImages.filter((image) => image.image_hash !== imageHash)
     );
-  }
+  };
 
   const handleEditCatalogue = (image: ImageData) => {
     setEditingImage(image);
@@ -468,7 +472,7 @@ export default function AdminReview() {
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => handleDelete(image.image_hash)}
+                  onClick={() => setImageToDelete(image.image_hash)}
                 >
                   <X className="w-4 h-4 mr-1" /> 删除
                 </Button>
@@ -590,7 +594,7 @@ export default function AdminReview() {
                         size="sm"
                         className="mt-2 w-full"
                         onClick={() => {
-                          handleDelete(duplicate.duplicate_idiom_hash);
+                          /*handleDelete(duplicate.duplicate_idiom_hash);
                           setDuplicates((prevDuplicates) =>
                             prevDuplicates.filter(
                               (dup) =>
@@ -598,6 +602,9 @@ export default function AdminReview() {
                                 duplicate.duplicate_idiom_hash
                             )
                           );
+                          */
+                          setImageToDelete(duplicate.duplicate_idiom_hash);
+                          setNeedUpdatedDuplicates(true);
                         }}
                       >
                         删除重复
@@ -628,6 +635,41 @@ export default function AdminReview() {
                 </div>
               </>
             )}
+          </DialogContent>
+        </Dialog>
+      )}
+      {imageToDelete && (
+        <Dialog
+          open={!!imageToDelete}
+          onOpenChange={() => setImageToDelete(null)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>你确定吗</DialogTitle>
+            </DialogHeader>
+            <p>确定删除图片 {imageToDelete} 吗？</p>
+            <DialogFooter>
+              <Button onClick={() => setImageToDelete(null)} variant="outline">
+                再想想
+              </Button>
+              <Button
+                onClick={() => {
+                  handleDelete(imageToDelete);
+                  setImageToDelete(null);
+                  if (needUpdatedDuplicates) {
+                    setNeedUpdatedDuplicates(false);
+                    setDuplicates((prevDuplicates) =>
+                      prevDuplicates.filter(
+                        (dup) => dup.duplicate_idiom_hash !== imageToDelete
+                      )
+                    );
+                  }
+                }}
+                variant="destructive"
+              >
+                我确定
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
