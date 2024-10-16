@@ -272,6 +272,26 @@ export default function AdminReview() {
     );
   };
 
+  const handleDelete = async (imageHash: string) => {
+    console.log("Deleting image:", imageHash);
+    const response = await fetch(`/api/admin/delete?image_hash=${imageHash}`);
+    if (!response.ok || (await response.json()).message !== "ok") {
+      toast({
+        title: "错误",
+        description: "删除失败，请重试。（应该没用）",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "删除成功",
+      description: `图片 ${imageHash} 的记录已被删除！`,
+    });
+    setImages((prevImages) =>
+      prevImages.filter((image) => image.image_hash !== imageHash)
+    );
+  }
+
   const handleEditCatalogue = (image: ImageData) => {
     setEditingImage(image);
   };
@@ -410,7 +430,7 @@ export default function AdminReview() {
                 </p>
                 {image.catalogue.length > 0 && (
                   <p className="text-sm text-gray-600 mt-auto">
-                    所属ep:{" "}
+                    所属怡批:{" "}
                     {image.catalogue
                       .map((cat) => {
                         for (const [key, values] of Object.entries(
@@ -443,7 +463,14 @@ export default function AdminReview() {
                   onClick={() => handleReject(image.image_hash)}
                   disabled={image.under_review}
                 >
-                  <X className="w-4 h-4 mr-1" /> 打回
+                  <Copy className="w-4 h-4 mr-1" /> 打回
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(image.image_hash)}
+                >
+                  <X className="w-4 h-4 mr-1" /> 删除
                 </Button>
               </div>
               <DropdownMenu>
@@ -562,6 +589,16 @@ export default function AdminReview() {
                         variant="destructive"
                         size="sm"
                         className="mt-2 w-full"
+                        onClick={() => {
+                          handleDelete(duplicate.duplicate_idiom_hash);
+                          setDuplicates((prevDuplicates) =>
+                            prevDuplicates.filter(
+                              (dup) =>
+                                dup.duplicate_idiom_hash !==
+                                duplicate.duplicate_idiom_hash
+                            )
+                          );
+                        }}
                       >
                         删除重复
                       </Button>
