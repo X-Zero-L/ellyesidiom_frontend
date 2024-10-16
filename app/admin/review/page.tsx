@@ -401,6 +401,9 @@ export default function AdminReview() {
                   {new Date(image.timestamp).toLocaleString()}
                 </p>
                 <p className="text-sm text-gray-600">
+                  图片ID: {image.image_hash}
+                </p>
+                <p className="text-sm text-gray-600">
                   {image.uploader.nickname !== "UNK"
                     ? `上传怡批: ${image.uploader.nickname} (${image.uploader.id})`
                     : "管理员导入"}
@@ -550,7 +553,7 @@ export default function AdminReview() {
                         </CardContent>
                       </Card>
                       <p className="text-sm mt-2">
-                        哈希: {duplicate.duplicate_idiom_hash}
+                        图片ID: {duplicate.duplicate_idiom_hash}
                       </p>
                       <p className="text-sm mt-2">
                         重复度: {duplicate.score}/{duplicate.score_threshold}
