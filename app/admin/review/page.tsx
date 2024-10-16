@@ -15,6 +15,7 @@ import {
   List,
   Search,
   Shuffle,
+  Info,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -27,6 +28,13 @@ import "react-photo-view/dist/react-photo-view.css";
 import { Toaster } from "@/components/ui/toaster";
 import { EditCatalogueDialog } from "@/components/edit-cat-dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type ImageData = {
   tags: string[];
@@ -49,6 +57,7 @@ export default function AdminReview() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingImage, setEditingImage] = useState<ImageData | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const router = useRouter();
   const { toast } = useToast();
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -309,7 +318,10 @@ export default function AdminReview() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {images.map((image) => (
-          <Card key={image.image_hash} className="overflow-hidden flex flex-col h-full">
+          <Card
+            key={image.image_hash}
+            className="overflow-hidden flex flex-col h-full"
+          >
             <CardContent className="p-0 flex-grow">
               <div className="relative aspect-video">
                 <PhotoProvider>
@@ -330,11 +342,10 @@ export default function AdminReview() {
                 <p className="text-sm text-gray-500 mb-2">
                   {new Date(image.timestamp).toLocaleString()}
                 </p>
-                <p className="font-semibold mb-2">
-                  {image.ocr_text.join(", ")}
-                </p>
                 <p className="text-sm text-gray-600">
-                  { image.uploader.nickname !== "UNK" ? `上传怡批: ${image.uploader.nickname} (${image.uploader.id})` : "管理员导入" }
+                  {image.uploader.nickname !== "UNK"
+                    ? `上传怡批: ${image.uploader.nickname} (${image.uploader.id})`
+                    : "管理员导入"}
                 </p>
                 {image.catalogue.length > 0 && (
                   <p className="text-sm text-gray-600 mt-auto">
@@ -384,6 +395,9 @@ export default function AdminReview() {
                   <DropdownMenuItem onClick={() => handleEditCatalogue(image)}>
                     <List className="w-4 h-4 mr-2" /> 编辑怡批
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSelectedImage(image)}>
+                    <Info className="w-4 h-4 mr-2" /> 详情
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </CardFooter>
@@ -400,6 +414,30 @@ export default function AdminReview() {
           catalogueData={catalogueData}
           setNeedFetchUpdatedImageInfo={setNeedFetchUpdatedImageInfo}
         />
+      )}
+      {selectedImage && (
+        <Dialog
+          open={!!selectedImage}
+          onOpenChange={() => setSelectedImage(null)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>图片详情</DialogTitle>
+            </DialogHeader>
+            <div className="mt-2">
+              <h3 className="font-semibold">OCR 结果:</h3>
+              <p>{selectedImage?.ocr_text.join(", ")}</p>
+            </div>
+            <div className="mt-2">
+              <h3 className="font-semibold">标签:</h3>
+              <p>{selectedImage?.tags.join(", ") || "无标签"}</p>
+            </div>
+            <div className="mt-2">
+              <h3 className="font-semibold">评论:</h3>
+              <p>{selectedImage?.comment.join(", ") || "无评论"}</p>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
