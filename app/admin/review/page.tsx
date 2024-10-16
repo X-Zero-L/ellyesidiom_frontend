@@ -41,6 +41,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { init } from "next/dist/compiled/webpack/webpack";
 
 type ImageData = {
   tags: string[];
@@ -114,7 +115,7 @@ export default function AdminReview() {
     }
   };
 
-  const fetchImages = async (initialLoad = false) => {
+  const fetchImages = async (initialLoad = false, second = false) => {
     try {
       const payload: {
         keyword?: string;
@@ -127,10 +128,10 @@ export default function AdminReview() {
         if (searchKeyword) {
           payload.keyword = searchKeyword;
         }
-        if (isUnderReview) {
-          payload.under_review = isUnderReview;
-        } else {
+        if (second) {
           payload.under_review = false;
+        } else {
+          payload.under_review = isUnderReview;
         }
         if (limit) {
           payload.limit = parseInt(limit);
@@ -146,6 +147,7 @@ export default function AdminReview() {
       if (response.ok) {
         const data = await response.json();
         if (data.data.length === 0 || Object.keys(data.data).length === 0) {
+          if (initialLoad) return -1;
           toast({
             title: "Error",
             description:
@@ -162,6 +164,7 @@ export default function AdminReview() {
       }
     } catch (error) {
       console.error("Error fetching images:", error);
+      if (initialLoad) return -1;
       toast({
         title: "Error",
         description: "Failed to fetch images. Please try again.",
@@ -187,7 +190,9 @@ export default function AdminReview() {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
   useEffect(() => {
-    fetchImages();
+    fetchImages(true).then((res) => {
+      if (res === -1) fetchImages(false, true);
+    });
     fetchCatalogueData();
   }, [router, toast]);
 
