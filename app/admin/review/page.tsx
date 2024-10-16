@@ -26,13 +26,6 @@ import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 import { Toaster } from "@/components/ui/toaster";
 import { EditCatalogueDialog } from "@/components/edit-cat-dialog";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@radix-ui/react-select";
 import { Input } from "@/components/ui/input";
 
 type ImageData = {
@@ -61,6 +54,27 @@ export default function AdminReview() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [isUnderReview, setIsUnderReview] = useState(true);
   const [limit, setLimit] = useState("100");
+  const [catalogueData, setCatalogueData] = useState<{ [key: string]: string[] }>({});
+  const fetchCatalogueData = async () => {
+    try {
+      const response = await fetch("/api/admin/cats");
+      if (response.ok) {
+        const data = await response.json();
+        setCatalogueData(data.data);
+      } else {
+        throw new Error("Failed to fetch catalogue data");
+      }
+    } catch (error) {
+      console.error("Error fetching catalogue data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch catalogue data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchImages = async (initialLoad = false) => {
     try {
@@ -121,6 +135,7 @@ export default function AdminReview() {
 
   useEffect(() => {
     fetchImages();
+    fetchCatalogueData();
   }, [router, toast]);
 
   const handleSearch = () => {
@@ -308,7 +323,7 @@ export default function AdminReview() {
                   上传者: {image.uploader.nickname} ({image.uploader.platform})
                 </p>
                 <p className="text-sm text-gray-600">
-                  目录: {image.catalogue.join(", ")}
+                  所属ep: {image.catalogue.join(", ")}
                 </p>
               </div>
             </CardContent>
@@ -354,6 +369,7 @@ export default function AdminReview() {
           onClose={handleCloseEditDialog}
           imageHash={editingImage.image_hash}
           currentCatalogue={editingImage.catalogue}
+          catalogueData={catalogueData}
         />
       )}
     </div>

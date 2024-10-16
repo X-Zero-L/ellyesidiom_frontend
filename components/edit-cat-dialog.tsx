@@ -22,6 +22,7 @@ type EditCatalogueDialogProps = {
   onClose: () => void;
   imageHash: string;
   currentCatalogue: string[];
+  catalogueData: CatalogueData;
 };
 
 export function EditCatalogueDialog({
@@ -29,40 +30,13 @@ export function EditCatalogueDialog({
   onClose,
   imageHash,
   currentCatalogue,
+  catalogueData,
 }: EditCatalogueDialogProps) {
-  const [catalogueData, setCatalogueData] = useState<CatalogueData>({});
-  const [loading, setLoading] = useState(true);
   const [selectedCatalogue, setSelectedCatalogue] =
     useState<string[]>(currentCatalogue);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchCatalogueData = async () => {
-      try {
-        const response = await fetch("/api/admin/cats");
-        if (response.ok) {
-          const data = await response.json();
-          setCatalogueData(data.data);
-        } else {
-          throw new Error("Failed to fetch catalogue data");
-        }
-      } catch (error) {
-        console.error("Error fetching catalogue data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch catalogue data. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isOpen) {
-      fetchCatalogueData();
-    }
-  }, [isOpen, toast]);
   const handleSave = async () => {
     try {
       const response = await fetch("/api/admin/edit_catalogue", {
@@ -102,18 +76,6 @@ export function EditCatalogueDialog({
         value.toLowerCase().includes(searchTerm.toLowerCase())
       )
   );
-
-  if (loading) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent>
-          <div className="flex items-center justify-center h-40">
-            <Loader2 className="w-8 h-8 animate-spin" />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
