@@ -87,7 +87,7 @@ export default function AdminReview() {
     useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   // const duplicatesPerPage = window.innerWidth < 640 ? 4 : 9;
-  const [duplicatesPerPage, setDuplicatesPerPage] = useState(4);
+  const [duplicatesPerPage, setDuplicatesPerPage] = useState(9);
   const [isDuplicatesDialogOpen, setIsDuplicatesDialogOpen] = useState(false);
   const [catalogueData, setCatalogueData] = useState<{
     [key: string]: string[];
@@ -513,13 +513,6 @@ export default function AdminReview() {
                 >
                   <X className="w-4 h-4 mr-1" /> 删除
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCheckDuplicates(image.image_hash)}
-                >
-                  <Shuffle className="w-4 h-4 mr-1" /> 查重
-                </Button>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -538,6 +531,11 @@ export default function AdminReview() {
                     onClick={() => setEditingImageComment(image)}
                   >
                     <MessageCircle className="w-4 h-4 mr-2" /> 编辑评论
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleCheckDuplicates(image.image_hash)}
+                  >
+                    <Shuffle className="w-4 h-4 mr-2" /> 查重
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setSelectedImage(image)}>
                     <Info className="w-4 h-4 mr-2" /> 详情
@@ -628,7 +626,7 @@ export default function AdminReview() {
               <p>没有发现重复图片。</p>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 overflow-y-auto max-h-[60vh] sm:max-h-[70vh]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-[60vh] sm:max-h-[70vh]">
                   {currentDuplicates.map((duplicate) => (
                     <div
                       key={duplicate.duplicate_idiom_hash}
