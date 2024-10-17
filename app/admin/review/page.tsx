@@ -41,7 +41,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { init } from "next/dist/compiled/webpack/webpack";
 
 type ImageData = {
   tags: string[];
@@ -88,25 +87,16 @@ export default function AdminReview() {
     useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   // const duplicatesPerPage = window.innerWidth < 640 ? 4 : 9;
-  const [duplicatesPerPage, setDuplicatesPerPage] = useState(
-    window.innerWidth < 640 ? 4 : 9
-  );
+  const [duplicatesPerPage, setDuplicatesPerPage] = useState(4);
+  const [isDuplicatesDialogOpen, setIsDuplicatesDialogOpen] = useState(false);
   const [catalogueData, setCatalogueData] = useState<{
     [key: string]: string[];
   }>({});
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
   const [needUpdatedDuplicates, setNeedUpdatedDuplicates] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setDuplicatesPerPage(window.innerWidth < 640 ? 4 : 9);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const handleCloseDuplicates = () => {
+    setIsDuplicatesDialogOpen(false);
     setDuplicates([]);
     setCurrentPage(1);
   };
@@ -392,6 +382,7 @@ export default function AdminReview() {
           });
         }
         setDuplicates(data.data.dedup_list || []);
+        setIsDuplicatesDialogOpen(true);
       } else {
         throw new Error("Failed to check duplicates");
       }
@@ -615,89 +606,101 @@ export default function AdminReview() {
           </DialogContent>
         </Dialog>
       )}
-      <Dialog open={duplicates.length > 0} onOpenChange={handleCloseDuplicates}>
-        <DialogContent className="max-w-full sm:max-w-4xl h-full sm:h-auto">
-          <DialogHeader className="flex flex-row items-center justify-between">
-            <DialogTitle>重复图片检查结果</DialogTitle>
-          </DialogHeader>
-          {checkingDuplicates ? (
-            <div className="flex justify-center items-center h-40">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            </div>
-          ) : duplicates.length === 0 ? (
-            <p>没有发现重复图片。</p>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-[60vh] sm:max-h-[70vh]">
-                {currentDuplicates.map((duplicate) => (
-                  <div
-                    key={duplicate.duplicate_idiom_hash}
-                    className="border rounded p-2"
-                  >
-                    <Card className="overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="relative aspect-video">
-                          <PhotoProvider>
-                            <PhotoView
-                              src={`https://ei-images.hypermax.app/${duplicate.duplicate_idiom_hash}.${duplicate.duplicate_idiom_ext}`}
-                            >
-                              <Image
-                                src={`https://ei-images.hypermax.app/${duplicate.duplicate_idiom_hash}.${duplicate.duplicate_idiom_ext}`}
-                                alt="Duplicate image"
-                                layout="fill"
-                                objectFit="cover"
-                                className="bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
-                              />
-                            </PhotoView>
-                          </PhotoProvider>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <p className="text-sm mt-2 truncate">
-                      图片ID: {duplicate.duplicate_idiom_hash}
-                    </p>
-                    <p className="text-sm mt-2">
-                      重复度: {duplicate.score}/{duplicate.score_threshold}
-                    </p>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="mt-2 w-full"
-                      onClick={() => {
-                        setImageToDelete(duplicate.duplicate_idiom_hash);
-                        setNeedUpdatedDuplicates(true);
-                      }}
+      {checkingDuplicates && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      )}
+      {duplicates.length > 0 && (
+        <Dialog
+          open={isDuplicatesDialogOpen}
+          onOpenChange={setIsDuplicatesDialogOpen}
+        >
+          <DialogContent className="max-w-full sm:max-w-4xl h-full sm:h-auto">
+            <DialogHeader className="flex flex-row items-center justify-between">
+              <DialogTitle>重复图片检查结果</DialogTitle>
+            </DialogHeader>
+            {checkingDuplicates ? (
+              <div className="flex justify-center items-center h-40">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              </div>
+            ) : duplicates.length === 0 ? (
+              <p>没有发现重复图片。</p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 overflow-y-auto max-h-[60vh] sm:max-h-[70vh]">
+                  {currentDuplicates.map((duplicate) => (
+                    <div
+                      key={duplicate.duplicate_idiom_hash}
+                      className="border rounded p-2"
                     >
-                      删除重复
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-between items-center mt-4">
-                <Button
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="sm"
-                >
-                  <ChevronLeft className="w-4 h-4 mr-2" /> 上一页
-                </Button>
-                <span className="text-sm">
-                  第 {currentPage} 页，共 {totalPages} 页
-                </span>
-                <Button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                  size="sm"
-                >
-                  下一页 <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+                      <Card className="overflow-hidden">
+                        <CardContent className="p-0">
+                          <div className="relative aspect-video">
+                            <PhotoProvider>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-[60vh] sm:max-h-[70vh]">
+                                <PhotoView
+                                  src={`https://ei-images.hypermax.app/${duplicate.duplicate_idiom_hash}.${duplicate.duplicate_idiom_ext}`}
+                                >
+                                  <Image
+                                    src={`https://ei-images.hypermax.app/${duplicate.duplicate_idiom_hash}.${duplicate.duplicate_idiom_ext}`}
+                                    alt="Duplicate image"
+                                    layout="fill"
+                                    objectFit="cover"
+                                    className="bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
+                                  />
+                                </PhotoView>
+                              </div>
+                            </PhotoProvider>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <p className="text-sm mt-2 truncate">
+                        图片ID: {duplicate.duplicate_idiom_hash}
+                      </p>
+                      <p className="text-sm mt-2">
+                        重复度: {duplicate.score}/{duplicate.score_threshold}
+                      </p>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="mt-2 w-full"
+                        onClick={() => {
+                          setImageToDelete(duplicate.duplicate_idiom_hash);
+                          setNeedUpdatedDuplicates(true);
+                        }}
+                      >
+                        删除重复
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <Button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-2" /> 上一页
+                  </Button>
+                  <span className="text-sm">
+                    第 {currentPage} 页，共 {totalPages} 页
+                  </span>
+                  <Button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    variant="outline"
+                    size="sm"
+                  >
+                    下一页 <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
       {imageToDelete && (
         <Dialog
           open={!!imageToDelete}
