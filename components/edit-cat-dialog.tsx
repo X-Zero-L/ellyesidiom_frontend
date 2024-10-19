@@ -109,25 +109,25 @@ export function EditCatalogueDialog({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                 >
                   <Label
                     htmlFor={key}
-                    className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+                    className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer w-full"
                   >
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden">
+                    <div className="relative w-10 h-10 flex-shrink-0">
                       <Image
                         src={`https://q1.qlogo.cn/g?b=qq&nk=${key}&s=100`}
                         alt={`QQ Avatar for ${key}`}
                         layout="fill"
                         objectFit="cover"
+                        className="rounded-full"
                       />
                     </div>
-                    <div className="flex-grow">
-                      <span className="text-sm font-medium">{key}</span>
-                      <p className="text-xs text-gray-500">{values.join(", ")}</p>
+                    <div className="flex-grow min-w-0">
+                      <span className="text-sm font-medium block truncate">{key}</span>
+                      <p className="text-xs text-gray-500 truncate">{values.join(", ")}</p>
                     </div>
-                    <div className="flex items-center justify-center w-6 h-6">
+                    <div className="flex-shrink-0 ml-2">
                       <input
                         type="checkbox"
                         id={key}
