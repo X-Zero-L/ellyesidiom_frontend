@@ -124,8 +124,9 @@ export function EditCatalogueDialog({
                       />
                     </div>
                     <div className="flex-grow min-w-0">
-                      <span className="text-sm font-medium block truncate">{key}</span>
-                      <p className="text-xs text-gray-500 truncate">{values.join(", ")}</p>
+                      <span className="text-sm font-medium block truncate">{values[0]}</span>
+                      <p className="text-xs text-gray-500 truncate">{key}</p>
+                      <p className="text-xs text-gray-500 truncate">{values.slice(1).join(", ")}</p>
                     </div>
                     <div className="flex-shrink-0 ml-2">
                       <input
