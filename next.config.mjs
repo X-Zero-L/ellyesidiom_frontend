@@ -20,6 +20,12 @@ const nextConfig = {
             hostname: "*maxng.cc",
             port: "3889",
             pathname: "/**",
+          },
+          {
+            protocol: "https",
+            hostname: "*qlogo.cn",
+            port: "",
+            pathname: "/**",
           }
         ],
       },
