@@ -169,6 +169,14 @@ export default function ImageGallery () {
     setSelectedImage(null)
   }
 
+  if (!user) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <Loader2 className='w-8 h-8 animate-spin text-primary' />
+      </div>
+    )
+  }
+
   return (
     <div className='min-h-screen bg-gray-100'>
       <header className='bg-white shadow'>
