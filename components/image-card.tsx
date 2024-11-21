@@ -156,7 +156,28 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
       })
     }
   }
+  const buttonVariants = {
+    rest: { scale: 1 },
+    hover: { scale: 1.1 },
+    tap: { scale: 0.95 }
+  }
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  }
   const handleHate = async () => {
     try {
       if (isLiked && !isHated) {
@@ -205,13 +226,22 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
             />
           </PhotoView>
         </PhotoProvider>
-        <div className='absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent'>
+        <motion.div
+          className='absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent'
+          initial='hidden'
+          animate='visible'
+          variants={containerVariants}
+        >
           <div className='flex justify-between items-center'>
-            <div className='flex space-x-2'>
-              <div className='flex items-center space-x-2'>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+            <motion.div className='flex space-x-2' variants={itemVariants}>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.div
+                      variants={buttonVariants}
+                      whileHover='hover'
+                      whileTap='tap'
+                    >
                       <Button
                         variant='ghost'
                         size='sm'
@@ -231,19 +261,31 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
                               : 'text-gray-600 dark:text-gray-300'
                           )}
                         />
-                        <span className='ml-1'>{likes}</span>
+                        <motion.span
+                          className='ml-1'
+                          key={likes}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                        >
+                          {likes}
+                        </motion.span>
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{isLiked ? '不再赞同' : '深表赞同'}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div className='flex items-center space-x-2'>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+                    </motion.div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isLiked ? '不再赞同' : '深表赞同'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.div
+                      variants={buttonVariants}
+                      whileHover='hover'
+                      whileTap='tap'
+                    >
                       <Button
                         variant='ghost'
                         size='sm'
@@ -261,46 +303,66 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
                             isHated ? 'text-white fill-white' : 'text-gray-500'
                           )}
                         />
-                        <span className='ml-1'>{hates}</span>
+                        <motion.span
+                          className='ml-1'
+                          key={hates}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                        >
+                          {hates}
+                        </motion.span>
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{isHated ? '不够垃圾' : '垃圾怡言'}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+                    </motion.div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isHated ? '不够垃圾' : '垃圾怡言'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='text-white hover:bg-white/20'
-                      onClick={() => setShowDetails(true)}
+                    <motion.div
+                      variants={buttonVariants}
+                      whileHover='hover'
+                      whileTap='tap'
                     >
-                      <MessageCircle className='h-5 w-5' />
-                      <span className='ml-1'>{image.comment.length}</span>
-                    </Button>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-white hover:bg-white/20'
+                        onClick={() => setShowDetails(true)}
+                      >
+                        <MessageCircle className='h-5 w-5' />
+                        <span className='ml-1'>{image.comment.length}</span>
+                      </Button>
+                    </motion.div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>显示详情</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            </div>
-            <div className='flex space-x-2'>
+            </motion.div>
+            <motion.div className='flex space-x-2' variants={itemVariants}>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='text-white hover:bg-white/20'
-                      onClick={handleDownload}
+                    <motion.div
+                      variants={buttonVariants}
+                      whileHover='hover'
+                      whileTap='tap'
                     >
-                      <Download className='h-5 w-5' />
-                    </Button>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-white hover:bg-white/20'
+                        onClick={handleDownload}
+                      >
+                        <Download className='h-5 w-5' />
+                      </Button>
+                    </motion.div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>下载图片</p>
@@ -310,28 +372,41 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='text-white hover:bg-white/20'
-                      onClick={handleCopyToClipboard}
+                    <motion.div
+                      variants={buttonVariants}
+                      whileHover='hover'
+                      whileTap='tap'
                     >
-                      <ClipboardCopy className='h-5 w-5' />
-                    </Button>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-white hover:bg-white/20'
+                        onClick={handleCopyToClipboard}
+                      >
+                        <ClipboardCopy className='h-5 w-5' />
+                      </Button>
+                    </motion.div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>复制到剪贴板</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            </div>
+            </motion.div>
           </div>
-        </div>
-        {image.under_review && (
-          <div className='absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded'>
-            未审查
-          </div>
-        )}
+        </motion.div>
+        <AnimatePresence>
+          {image.under_review && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className='absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded'
+            >
+              未审查
+            </motion.div>
+          )}
+        </AnimatePresence>
       </CardContent>
       <ImageDetailsModal
         image={image}
