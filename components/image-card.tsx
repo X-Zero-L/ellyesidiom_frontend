@@ -1,23 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Tag,
-  MessageCircle,
-  Layers,
-  Download,
-  ClipboardCopy,
-  MoreVertical,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Download, ClipboardCopy, Heart, MessageCircle, Tag } from 'lucide-react';
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { useToast } from "@/hooks/use-toast";
 import "react-photo-view/dist/react-photo-view.css";
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { text } from "stream/consumers";
+import { ImageDetailsModal } from "./image-detail-modal";
 
 type ImageData = {
   tags: string[];
@@ -31,30 +25,41 @@ type ImageData = {
     id: string;
     platform: string;
   };
+  likes: string[];
+  image_hash: string; // Added image_hash field
 };
 
 type ImageCardProps = {
   image: ImageData;
+  user: UserModel;
 };
 
-export default function ImageCard({ image }: ImageCardProps) {
+interface UserModel {
+  user_id: string
+  nickname: string
+  api_key: string | null
+}
+
+export default function ImageCard({ image, user }: ImageCardProps) {
   const { toast } = useToast();
-  const [showTools, setShowTools] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState(image.likes.length);
+  const [showDetails, setShowDetails] = useState(false);
   const imageUrl = image.image_url;
+
+  useEffect(() => {
+    setIsLiked(image.likes.includes(user.user_id));
+  }, [image.likes, user.user_id]);
+
   const handleDownload = async () => {
     try {
       const response = await fetch("/api/download", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: imageUrl }),
       });
       const data = await response.json();
-      const base64 = data.base64;
-      const blob = new Blob([Buffer.from(base64, "base64")], {
-        type: "image/png",
-      });
+      const blob = new Blob([Buffer.from(data.base64, "base64")], { type: "image/png" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -62,6 +67,7 @@ export default function ImageCard({ image }: ImageCardProps) {
       link.click();
     } catch (error) {
       console.error("Download failed:", error);
+      toast({ title: "下载失败", description: "请稍后重试", variant: "destructive" });
     }
   };
 
@@ -69,122 +75,148 @@ export default function ImageCard({ image }: ImageCardProps) {
     try {
       const response = await fetch("/api/download", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: imageUrl }),
       });
       const data = await response.json();
-      const base64 = data.base64;
-      const blob = await (
-        await fetch(`data:image/png;base64,${base64}`)
-      ).blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob,
-        }),
-      ]);
-      toast({
-        title: "图片已复制到剪贴板",
-        description: "快粘贴到EP群里分享给大家吧！",
-      });
+      const blob = await (await fetch(`data:image/png;base64,${data.base64}`)).blob();
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      toast({ title: "图片已复制到剪贴板", description: "快粘贴到EP群里分享给大家吧！" });
     } catch (error) {
       console.error("Copy to clipboard failed:", error);
-      toast({
-        title: "图片复制失败",
-        description: "请重试",
-        variant: "destructive",
-      });
+      toast({ title: "复制失败", description: "请稍后重试", variant: "destructive" });
     }
   };
+
+  const handleLike = async () => {
+    try {
+      const endpoint = isLiked ? '/api/unlike' : '/api/like';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_hash: image.image_hash }),
+      });
+
+      if (response.ok) {
+        setIsLiked(!isLiked);
+        setLikes(isLiked ? likes - 1 : likes + 1);
+        toast({ 
+          title: isLiked ? "取消点赞成功" : "点赞成功", 
+          description: isLiked ? "您已取消对该怡言的点赞" : "您已成功点赞该怡言", 
+        });
+      } else {
+        throw new Error('Failed to update like status');
+      }
+    } catch (error) {
+      console.error("Like/Unlike failed:", error);
+      toast({ title: "操作失败", description: "请稍后重试", variant: "destructive" });
+    }
+  };
+
   return (
-    <div>
-      <Card
-        className="overflow-hidden"
-        // onClick={() => onImageClick(image.image_url)}
-      >
-        <CardContent className="p-0">
-          <PhotoProvider>
-            <PhotoView src={image.image_url}>
-              <img
-                src={image.image_url}
-                alt="Gallery Image"
-                width={500}
-                height={300}
-                className="object-cover bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
-              />
-            </PhotoView>
-          </PhotoProvider>
-          <div className="p-4">
-            <p className="text-sm text-gray-500 mb-2">
-              {new Date(image.timestamp).toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-600">
-              图片ID: {image.image_url.split("/").pop()?.split(".")[0]}
-            </p>
-            {image.uploader.nickname !== "UNK" ? (
-              <p className="text-sm text-gray-600">
-                上传怡批: {image.uploader.nickname} ({image.uploader.id})
-              </p>
-            ) : (
-              <p className="text-sm text-gray-600">管理员导入</p>
-            )}
-            {image.catalogue.length > 0 && (
-              <p className="text-sm text-gray-600 mt-auto">
-                所属怡批:
-                {image.catalogue.join(", ")}
-              </p>
-            )}
-            <div className="absolute top-2 right-2 flex gap-2">
-              <Button
-                className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
-                onClick={handleDownload}
-              >
-                <Download className="h-6 w-6" />
-              </Button>
-              <Button
-                className="text-white bg-black bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full"
-                onClick={handleCopyToClipboard}
-              >
-                <ClipboardCopy className="h-6 w-6" />
-              </Button>
-              {image.tags.length > 0 && (
-                <div className="mb-2">
-                  <h3 className="text-sm font-semibold mb-1">Tags:</h3>
-                  <div className="flex flex-wrap gap-1">
-                    {image.tags.map((tag, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="bg-white/20"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {image.comment.length > 0 && (
-                <div className="mb-2">
-                  <h3 className="text-sm font-semibold mb-1">评论：</h3>
-                  <ul className="list-disc list-inside">
-                    {image.comment.map((comment, index) => (
-                      <li key={index} className="text-sm">
-                        {comment}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+    <Card className="overflow-hidden group relative">
+      <CardContent className="p-0">
+        <PhotoProvider>
+          <PhotoView src={image.image_url}>
+            <Image
+              src={image.image_url}
+              alt="Gallery Image"
+              width={500}
+              height={300}
+              className="w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90"
+            />
+          </PhotoView>
+        </PhotoProvider>
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
+          <div className="flex justify-between items-center">
+            <div className="flex space-x-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20"
+                      onClick={handleLike}
+                    >
+                      <Heart className={`h-5 w-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
+                      <span className="ml-1">{likes}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isLiked ? "取消点赞" : "点赞"}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20"
+                      onClick={() => setShowDetails(true)}
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                      <span className="ml-1">{image.comment.length}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>显示详情</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-            {image.under_review && (
-              <div className="absolute bottom-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
-                未审查
-              </div>
-            )}
+            <div className="flex space-x-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20"
+                      onClick={handleDownload}
+                    >
+                      <Download className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>下载图片</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20"
+                      onClick={handleCopyToClipboard}
+                    >
+                      <ClipboardCopy className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>复制到剪贴板</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+        </div>
+        {image.under_review && (
+          <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+            未审查
+          </div>
+        )}
+      </CardContent>
+      <ImageDetailsModal
+        image={image}
+        isOpen={showDetails}
+        onClose={() => setShowDetails(false)}
+      />
+    </Card>
+  )
 }
+

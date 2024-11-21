@@ -39,6 +39,8 @@ type ImageData = {
     id: string
     platform: string
   }
+  likes: string[];
+  image_hash: string; // Added image_hash field
 }
 
 interface UserModel {
@@ -126,9 +128,21 @@ export default function ImageGallery () {
       setLoading(false)
     }
   }
-
   useEffect(() => {
-    fetchUserInfo()
+    const initializeApp = async () => {
+      try {
+        setLoading(true)
+        await fetchUserInfo()
+        setLoading(false)
+      } catch (error) {
+        console.error('Error initializing app:', error)
+        setLoading(false)
+      }
+    }
+
+    initializeApp()
+  }, [])
+  useEffect(() => {
     fetchImages('/api/index')
   }, [])
 
@@ -243,7 +257,7 @@ export default function ImageGallery () {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className='mb-4 break-inside-avoid'
               >
-                <ImageCard image={image} />
+              {user  && <ImageCard image={image} user={user!}/>}
               </motion.div>
             ))}
           </motion.div>
