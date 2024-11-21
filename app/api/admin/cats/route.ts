@@ -1,5 +1,5 @@
-import { handleRequest } from "@/lib/middleware";
+import { handleRequestWithVerify} from "@/lib/middleware";
 
 export async function GET(request: Request) {
-  return handleRequest(request, "/api/cats");
+  return handleRequestWithVerify(request, "/api/cats");
 }

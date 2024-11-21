@@ -165,7 +165,7 @@ export default function AdminReview() {
         }
         setImages(data.data);
       } else if (response.status === 401) {
-        router.push("/admin/login");
+        router.push("/verify");
       } else {
         throw new Error("Failed to fetch images");
       }
@@ -212,21 +212,16 @@ export default function AdminReview() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("/api/admin/logout", { method: "POST" });
+      const response = await fetch('/api/user/logout', { method: 'POST' })
       if (response.ok) {
-        router.push("/admin/login");
+        router.push('/verify')
       } else {
-        throw new Error("Logout failed");
+        throw new Error('Logout failed')
       }
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast({
-        title: "Logout Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
+    } catch (err) {
+      console.error('Error during logout:', err)
     }
-  };
+  }
 
   const handleApprove = async (imageHash: string) => {
     // Implement approve logic here
