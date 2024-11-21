@@ -66,6 +66,7 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
 
   useEffect(() => {
     setIsLiked(image.likes.includes(user.user_id))
+    setIsHated(image.hates.includes(user.user_id))
   }, [image.likes, user.user_id])
 
   const handleDownload = async () => {
