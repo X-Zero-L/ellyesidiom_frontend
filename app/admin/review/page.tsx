@@ -404,8 +404,6 @@ export default function AdminReview() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">怡闻录管理</h1>
-        <Button onClick={handleLogout}>登出</Button>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="flex-1 flex gap-2">
