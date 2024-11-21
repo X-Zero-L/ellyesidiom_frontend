@@ -40,6 +40,7 @@ type ImageData = {
     platform: string
   }
   likes: string[];
+  hates: string[];
   image_hash: string; // Added image_hash field
 }
 

@@ -1,38 +1,52 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Download, ClipboardCopy, Heart, MessageCircle, Tag } from 'lucide-react';
-import { PhotoProvider, PhotoView } from "react-photo-view";
-import { useToast } from "@/hooks/use-toast";
-import "react-photo-view/dist/react-photo-view.css";
-import { ImageDetailsModal } from "./image-detail-modal";
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
+import {
+  Download,
+  ClipboardCopy,
+  Heart,
+  MessageCircle,
+  Tag,
+  ThumbsDown
+} from 'lucide-react'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
+import { useToast } from '@/hooks/use-toast'
+import 'react-photo-view/dist/react-photo-view.css'
+import { ImageDetailsModal } from './image-detail-modal'
+import { QQAvatarList } from './like-avatars'
 
 type ImageData = {
-  tags: string[];
-  image_url: string;
-  comment: string[];
-  catalogue: string[];
-  under_review: boolean;
-  timestamp: string;
+  tags: string[]
+  image_url: string
+  comment: string[]
+  catalogue: string[]
+  under_review: boolean
+  timestamp: string
   uploader: {
-    nickname: string;
-    id: string;
-    platform: string;
-  };
-  likes: string[];
-  image_hash: string; // Added image_hash field
-};
+    nickname: string
+    id: string
+    platform: string
+  }
+  likes: string[]
+  hates: string[]
+  image_hash: string // Added image_hash field
+}
 
 type ImageCardProps = {
-  image: ImageData;
-  user: UserModel;
-};
+  image: ImageData
+  user: UserModel
+}
 
 interface UserModel {
   user_id: string
@@ -40,125 +54,218 @@ interface UserModel {
   api_key: string | null
 }
 
-export default function ImageCard({ image, user }: ImageCardProps) {
-  const { toast } = useToast();
-  const [isLiked, setIsLiked] = useState(false);
-  const [likes, setLikes] = useState(image.likes.length);
-  const [showDetails, setShowDetails] = useState(false);
-  const imageUrl = image.image_url;
+export default function ImageCard ({ image, user }: ImageCardProps) {
+  const { toast } = useToast()
+  const [isLiked, setIsLiked] = useState(false)
+  const [isHated, setIsHated] = useState(false)
+  const [likes, setLikes] = useState(image.likes.length)
+  const [hates, setHates] = useState(image.hates.length)
+  const [showDetails, setShowDetails] = useState(false)
+  const imageUrl = image.image_url
 
   useEffect(() => {
-    setIsLiked(image.likes.includes(user.user_id));
-  }, [image.likes, user.user_id]);
+    setIsLiked(image.likes.includes(user.user_id))
+  }, [image.likes, user.user_id])
 
   const handleDownload = async () => {
     try {
-      const response = await fetch("/api/download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: imageUrl }),
-      });
-      const data = await response.json();
-      const blob = new Blob([Buffer.from(data.base64, "base64")], { type: "image/png" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "image.png";
-      link.click();
+      const response = await fetch('/api/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: imageUrl })
+      })
+      const data = await response.json()
+      const blob = new Blob([Buffer.from(data.base64, 'base64')], {
+        type: 'image/png'
+      })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'image.png'
+      link.click()
     } catch (error) {
-      console.error("Download failed:", error);
-      toast({ title: "下载失败", description: "请稍后重试", variant: "destructive" });
+      console.error('Download failed:', error)
+      toast({
+        title: '下载失败',
+        description: '请稍后重试',
+        variant: 'destructive'
+      })
     }
-  };
+  }
 
   const handleCopyToClipboard = async () => {
     try {
-      const response = await fetch("/api/download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: imageUrl }),
-      });
-      const data = await response.json();
-      const blob = await (await fetch(`data:image/png;base64,${data.base64}`)).blob();
-      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-      toast({ title: "图片已复制到剪贴板", description: "快粘贴到EP群里分享给大家吧！" });
+      const response = await fetch('/api/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: imageUrl })
+      })
+      const data = await response.json()
+      const blob = await (
+        await fetch(`data:image/png;base64,${data.base64}`)
+      ).blob()
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob })
+      ])
+      toast({
+        title: '图片已复制到剪贴板',
+        description: '快粘贴到EP群里分享给大家吧！'
+      })
     } catch (error) {
-      console.error("Copy to clipboard failed:", error);
-      toast({ title: "复制失败", description: "请稍后重试", variant: "destructive" });
+      console.error('Copy to clipboard failed:', error)
+      toast({
+        title: '复制失败',
+        description: '请稍后重试',
+        variant: 'destructive'
+      })
     }
-  };
+  }
 
   const handleLike = async () => {
     try {
-      const endpoint = isLiked ? '/api/unlike' : '/api/like';
+      if (isHated && !isLiked) {
+        throw new Error('你不能同时赞同和踩一个怡言')
+      }
+      const endpoint = isLiked ? '/api/unlike' : '/api/like'
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_hash: image.image_hash }),
-      });
+        body: JSON.stringify({ image_hash: image.image_hash })
+      })
 
       if (response.ok) {
-        setIsLiked(!isLiked);
-        setLikes(isLiked ? likes - 1 : likes + 1);
-        toast({ 
-          title: isLiked ? "取消点赞成功" : "点赞成功", 
-          description: isLiked ? "您已取消对该怡言的点赞" : "您已成功点赞该怡言", 
-        });
+        setIsLiked(!isLiked)
+        setLikes(isLiked ? likes - 1 : likes + 1)
+        toast({
+          title: isLiked ? '取消点赞成功' : '点赞成功',
+          description: isLiked ? '您已取消对该怡言的点赞' : '您已成功点赞该怡言'
+        })
+        image.likes = isLiked
+          ? image.likes.filter(id => id !== user.user_id)
+          : [...image.likes, user.user_id]
       } else {
-        throw new Error('Failed to update like status');
+        throw new Error('Failed to update like status')
       }
-    } catch (error) {
-      console.error("Like/Unlike failed:", error);
-      toast({ title: "操作失败", description: "请稍后重试", variant: "destructive" });
+    } catch (error: any) {
+      console.error('Like/Unlike failed:', error)
+      toast({
+        title: '操作失败',
+        description: `${error.message}`,
+        variant: 'destructive'
+      })
     }
-  };
+  }
 
+  const handleHate = async () => {
+    try {
+      if (isLiked && !isHated) {
+        throw new Error('你不能同时赞同和踩一个怡言')
+      }
+      const endpoint = isHated ? '/api/unhate' : '/api/hate'
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_hash: image.image_hash })
+      })
+
+      if (response.ok) {
+        setIsHated(!isHated)
+        setHates(isHated ? hates - 1 : hates + 1)
+        toast({
+          title: isHated ? '取消踩成功' : '踩成功',
+          description: isHated ? '您已取消对该怡言的踩' : '您已成功踩该怡言'
+        })
+        image.hates = isHated
+          ? image.hates.filter(id => id !== user.user_id)
+          : [...image.hates, user.user_id]
+      } else {
+        throw new Error('Failed to update hate status')
+      }
+    } catch (error: any) {
+      console.error('Hate/Unhate failed:', error)
+      toast({
+        title: '操作失败',
+        description: `${error.message}`,
+        variant: 'destructive'
+      })
+    }
+  }
   return (
-    <Card className="overflow-hidden group relative">
-      <CardContent className="p-0">
+    <Card className='overflow-hidden group relative'>
+      <CardContent className='p-0'>
         <PhotoProvider>
           <PhotoView src={image.image_url}>
             <Image
               src={image.image_url}
-              alt="Gallery Image"
+              alt='Gallery Image'
               width={500}
               height={300}
-              className="w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90"
+              className='w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90'
             />
           </PhotoView>
         </PhotoProvider>
-        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
-          <div className="flex justify-between items-center">
-            <div className="flex space-x-2">
+        <div className='absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent'>
+          <div className='flex justify-between items-center'>
+            <div className='flex space-x-2'>
+              <div className='flex items-center space-x-2'>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-white hover:bg-white/20'
+                        onClick={handleLike}
+                      >
+                        <Heart
+                          className={`h-5 w-5 ${
+                            isLiked ? 'fill-red-500 text-red-500' : ''
+                          }`}
+                        />
+                        <span className='ml-1'>{likes}</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isLiked ? '不再赞同' : '深表赞同'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='text-white hover:bg-white/20'
+                        onClick={handleHate}
+                      >
+                        <ThumbsDown
+                          className={`h-5 w-5 ${
+                            isHated ? 'fill-red-500 text-red-500' : ''
+                          }`}
+                        />
+                        <span className='ml-1'>{hates}</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isHated ? '不够垃圾' : '垃圾怡言'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/20"
-                      onClick={handleLike}
-                    >
-                      <Heart className={`h-5 w-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
-                      <span className="ml-1">{likes}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isLiked ? "取消点赞" : "点赞"}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/20"
+                      variant='ghost'
+                      size='sm'
+                      className='text-white hover:bg-white/20'
                       onClick={() => setShowDetails(true)}
                     >
-                      <MessageCircle className="h-5 w-5" />
-                      <span className="ml-1">{image.comment.length}</span>
+                      <MessageCircle className='h-5 w-5' />
+                      <span className='ml-1'>{image.comment.length}</span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -167,17 +274,17 @@ export default function ImageCard({ image, user }: ImageCardProps) {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="flex space-x-2">
+            <div className='flex space-x-2'>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/20"
+                      variant='ghost'
+                      size='sm'
+                      className='text-white hover:bg-white/20'
                       onClick={handleDownload}
                     >
-                      <Download className="h-5 w-5" />
+                      <Download className='h-5 w-5' />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -189,12 +296,12 @@ export default function ImageCard({ image, user }: ImageCardProps) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/20"
+                      variant='ghost'
+                      size='sm'
+                      className='text-white hover:bg-white/20'
                       onClick={handleCopyToClipboard}
                     >
-                      <ClipboardCopy className="h-5 w-5" />
+                      <ClipboardCopy className='h-5 w-5' />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -206,7 +313,7 @@ export default function ImageCard({ image, user }: ImageCardProps) {
           </div>
         </div>
         {image.under_review && (
-          <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+          <div className='absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded'>
             未审查
           </div>
         )}
@@ -219,4 +326,3 @@ export default function ImageCard({ image, user }: ImageCardProps) {
     </Card>
   )
 }
-
