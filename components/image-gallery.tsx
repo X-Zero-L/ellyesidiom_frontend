@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Key, Loader2, LogOut, Search, Shuffle, User } from 'lucide-react'
+import { Key, Loader2, LogOut, Search, Shuffle, User, UserCog } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -202,10 +202,14 @@ export default function ImageGallery () {
                       <p className="text-xs leading-none text-muted-foreground">QQ: {user.user_id}</p>
                     </div>
                   </DropdownMenuLabel>
+                  <DropdownMenuItem onSelect={() => router.push('/admin')}>
+                    <UserCog className="mr-2 h-4 w-4" />
+                    <span>管理员面板</span>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onSelect={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>登出</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
