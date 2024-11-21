@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { useUser } from '@/app/contexts/UserContext'
 
 type ImageData = {
   tags: string[]
@@ -60,26 +61,8 @@ export default function ImageGallery () {
   const [currentPage, setCurrentPage] = useState<'index' | 'search' | 'random'>(
     'index'
   )
-  const [user, setUser] = useState<UserModel | null>(null)
+  const { user } = useUser()
   const router = useRouter()
-
-  const fetchUserInfo = async () => {
-    try {
-      const response = await fetch('/api/user/get_user_info')
-      if (!response.ok) {
-        throw new Error('Failed to fetch user info')
-      }
-      const userData: UserModel = (await response.json()).data
-      if(!userData.api_key) {
-        throw new Error('User not verified')
-      }
-      setUser(userData)
-    } catch (err) {
-      console.error('Error fetching user info:', err)
-      setError('Failed to load user information')
-      router.push('/verify')
-    }
-  }
 
   const handleLogout = async () => {
     try {
@@ -129,20 +112,7 @@ export default function ImageGallery () {
       setLoading(false)
     }
   }
-  useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        setLoading(true)
-        await fetchUserInfo()
-        setLoading(false)
-      } catch (error) {
-        console.error('Error initializing app:', error)
-        setLoading(false)
-      }
-    }
 
-    initializeApp()
-  }, [])
   useEffect(() => {
     fetchImages('/api/index')
   }, [])
@@ -179,45 +149,6 @@ export default function ImageGallery () {
 
   return (
     <div className='min-h-screen bg-gray-100'>
-      <header className='bg-white shadow'>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900">怡闻录</h1>
-          </div>
-          <div className="w-8"> {/* This creates space for the avatar */}
-            {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
-                    <Avatar>
-                      <AvatarImage src={`https://q1.qlogo.cn/g?b=qq&nk=${user.user_id}&s=100`} alt={user.nickname} />
-                      <AvatarFallback>{user.nickname[0]}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.nickname}</p>
-                      <p className="text-xs leading-none text-muted-foreground">QQ: {user.user_id}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuItem onSelect={() => router.push('/admin')}>
-                    <UserCog className="mr-2 h-4 w-4" />
-                    <span>管理员面板</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>登出</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </div>
-      </header>
-      <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         <div className='flex flex-col sm:flex-row gap-4 mb-8'>
           <div className='flex-1 flex gap-2'>
             <Input
@@ -281,7 +212,6 @@ export default function ImageGallery () {
           onClose={handleCloseModal}
         />
         <Toaster />
-      </main>
     </div>
   )
 }
