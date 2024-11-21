@@ -44,7 +44,7 @@ export function VerificationPage() {
     }
   }
 
-  const checkVerificationStatus = async () => {
+  const checkVerificationStatus = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/check_verification', {
         method: 'POST',
@@ -56,13 +56,13 @@ export function VerificationPage() {
         setIsVerified(true)
         setUserId(data.user_id)
         setCurrentStep(3)
-        // 验证成功后重定向到下一页
-        setTimeout(() => router.push('/'), 3000)
+        // 验证成功后立即重定向到首页
+        router.push('/')
       }
     } catch (error) {
       console.error('检查验证状态时出错:', error)
     }
-  }
+  }, [publicKey, privateKey, router])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -70,7 +70,7 @@ export function VerificationPage() {
       interval = setInterval(checkVerificationStatus, 5000) // 每5秒检查一次
     }
     return () => clearInterval(interval)
-  }, [publicKey, isVerified])
+  }, [publicKey, isVerified, checkVerificationStatus])
 
   const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(verificationCommand)
