@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/use-toast'
 import 'react-photo-view/dist/react-photo-view.css'
 import { ImageDetailsModal } from './image-detail-modal'
 import { QQAvatarList } from './like-avatars'
+import { cn } from '@/lib/utils'
 
 type ImageData = {
   tags: string[]
@@ -214,13 +215,21 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
                       <Button
                         variant='ghost'
                         size='sm'
-                        className='text-white hover:bg-white/20'
+                        className={cn(
+                          'relative p-2 rounded-full transition-all duration-300 overflow-hidden',
+                          isLiked
+                            ? 'bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500'
+                            : 'bg-gray-200 dark:bg-gray-700'
+                        )}
                         onClick={handleLike}
                       >
                         <Heart
-                          className={`h-5 w-5 ${
-                            isLiked ? 'fill-red-500 text-red-500' : ''
-                          }`}
+                          className={cn(
+                            'h-5 w-5 transition-all duration-300',
+                            isLiked
+                              ? 'text-white fill-white'
+                              : 'text-gray-600 dark:text-gray-300'
+                          )}
                         />
                         <span className='ml-1'>{likes}</span>
                       </Button>
@@ -238,13 +247,19 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
                       <Button
                         variant='ghost'
                         size='sm'
-                        className='text-white hover:bg-white/20'
+                        className={cn(
+                          'p-2 rounded-full transition-all duration-300',
+                          isHated
+                            ? 'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500'
+                            : 'bg-gray-200 dark:bg-gray-700'
+                        )}
                         onClick={handleHate}
                       >
                         <ThumbsDown
-                          className={`h-5 w-5 ${
-                            isHated ? 'fill-gray-700 text-gray-700' : ''
-                          }`}
+                          className={cn(
+                            'h-5 w-5 transition-all duration-300',
+                            isHated ? 'text-white fill-white' : 'text-gray-500'
+                          )}
                         />
                         <span className='ml-1'>{hates}</span>
                       </Button>
