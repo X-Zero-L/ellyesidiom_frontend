@@ -243,7 +243,7 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
                       >
                         <ThumbsDown
                           className={`h-5 w-5 ${
-                            isHated ? 'fill-red-500 text-red-500' : ''
+                            isHated ? 'fill-gray-700 text-gray-700' : ''
                           }`}
                         />
                         <span className='ml-1'>{hates}</span>
