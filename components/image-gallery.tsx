@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Key, Loader2, LogOut, Search, Shuffle, User, UserCog } from 'lucide-react'
+import { Loader2, Search, Shuffle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,17 +15,6 @@ import {
 import ImageCard from './image-card'
 import ImageModal from './image-modal'
 import { Toaster } from './ui/toaster'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from './ui/dropdown-menu'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useUser } from '@/app/contexts/UserContext'
 import { MasonryGrid } from './masonry-grid'
 
@@ -41,15 +30,9 @@ type ImageData = {
     id: string
     platform: string
   }
-  likes: string[];
-  hates: string[];
-  image_hash: string;
-}
-
-interface UserModel {
-  user_id: string
-  nickname: string
-  api_key: string | null
+  likes: string[]
+  hates: string[]
+  image_hash: string
 }
 
 export default function ImageGallery() {
@@ -62,13 +45,18 @@ export default function ImageGallery() {
   const [randomCount, setRandomCount] = useState('5')
   const [currentPage, setCurrentPage] = useState<'index' | 'search' | 'random'>('index')
   const { user } = useUser()
+  const observerTarget = useRef(null)
 
-  const fetchImages = async (
+  const fetchImages = useCallback(async (
     url: string,
     payload: { keyword: string } | { count: number } | null = null,
     isAdd = false
   ) => {
-    setLoading(true)
+    if (isAdd) {
+      setLoadingMore(true)
+    } else {
+      setLoading(true)
+    }
     setError(null)
     try {
       const response = await fetch(url, {
@@ -79,11 +67,11 @@ export default function ImageGallery() {
         body: JSON.stringify(payload)
       })
       if (!response.ok) {
-        throw new Error('Failed to fetch images')
+        throw new Error('获取图片失败')
       }
       const data = await response.json()
       if (data.status === 'no result') {
-        setError('No result found for the search keyword, please try another one.')
+        setError('没有找到匹配的结果，请尝试其他关键词。')
         return
       }
       if (isAdd) {
@@ -92,47 +80,64 @@ export default function ImageGallery() {
         setImages(data.data)
       }
     } catch (err) {
-      setError('An error occurred while fetching images. Please try again.')
-      console.error('Failed to fetch images:', err)
+      setError('获取图片时发生错误。请稍后再试。')
+      console.error('获取图片失败:', err)
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchImages('/api/index')
-  }, [])
+  }, [fetchImages])
 
-  const handleSearch = () => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !loadingMore && !loading) {
+          handleLoadMore()
+        }
+      },
+      { threshold: 1.0 }
+    )
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current)
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current)
+      }
+    }
+  }, [loadingMore, loading])
+
+  const handleSearch = useCallback(() => {
     if (searchKeyword.trim()) {
       setCurrentPage('search')
       fetchImages(`/api/search`, { keyword: searchKeyword })
     }
-  }
+  }, [searchKeyword, fetchImages])
 
-  const handleRandom = () => {
+  const handleRandom = useCallback(() => {
     setCurrentPage('random')
     fetchImages(`/api/random?count=${randomCount}`, {
       count: parseInt(randomCount)
     })
-  }
+  }, [randomCount, fetchImages])
 
-  const handleImageClick = (imageUrl: string) => {
+  const handleImageClick = useCallback((imageUrl: string) => {
     setSelectedImage(imageUrl)
-  }
+  }, [])
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedImage(null)
-  }
+  }, [])
 
-  const handleLoadMore = async () => {
-    setLoadingMore(true)
-    try {
-      await fetchImages(`/api/random?count=20`, { count: 20 }, true)
-    } finally {
-      setLoadingMore(false)
-    }
-  }
+  const handleLoadMore = useCallback(async () => {
+    await fetchImages(`/api/random?count=6`, { count: 6 }, true)
+  }, [fetchImages])
 
   if (!user) {
     return (
@@ -141,9 +146,7 @@ export default function ImageGallery() {
       </div>
     )
   }
-  const imageItems = images.map((image, index) => (
-    <ImageCard key={`${image.image_hash}-${index}`} image={image} user={user} />
-  ))
+
   return (
     <div className='min-h-screen bg-gray-100'>
       <div className='flex flex-col sm:flex-row gap-4 mb-8'>
@@ -185,22 +188,20 @@ export default function ImageGallery() {
         <div className='text-center text-red-500'>{error}</div>
       ) : (
         <>
-          <MasonryGrid items={imageItems} columnWidth={300} />
-          <div className='mt-8 flex justify-center'>
-            <Button
-              onClick={handleLoadMore}
-              disabled={loadingMore}
-              className='px-6 py-2 text-lg'
-            >
-              {loadingMore ? (
-                <>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  加载中...
-                </>
-              ) : (
-                '加载更多'
-              )}
-            </Button>
+          <MasonryGrid
+            items={images}
+            columnWidth={300}
+            renderItem={(image, index, onHeightChange) => (
+              <ImageCard
+                key={`${image.image_hash}-${index}`}
+                image={image}
+                user={user}
+                onHeightChange={onHeightChange}
+              />
+            )}
+          />
+          <div ref={observerTarget} className='h-10 mt-8 flex justify-center items-center'>
+            {loadingMore && <Loader2 className='w-8 h-8 animate-spin text-primary' />}
           </div>
         </>
       )}

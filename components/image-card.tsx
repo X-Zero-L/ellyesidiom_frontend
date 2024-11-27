@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
@@ -44,9 +44,10 @@ type ImageData = {
   image_hash: string // Added image_hash field
 }
 
-type ImageCardProps = {
+interface ImageCardProps {
   image: ImageData
   user: UserModel
+  onHeightChange: (height: number) => void
 }
 
 interface UserModel {
@@ -55,7 +56,7 @@ interface UserModel {
   api_key: string | null
 }
 
-export default function ImageCard({ image, user }: ImageCardProps) {
+export default function ImageCard({ image, user, onHeightChange }: ImageCardProps) {
   const { toast } = useToast()
   const [isLiked, setIsLiked] = useState(false)
   const [isHated, setIsHated] = useState(false)
@@ -63,7 +64,13 @@ export default function ImageCard({ image, user }: ImageCardProps) {
   const [hates, setHates] = useState(image.hates.length)
   const [showDetails, setShowDetails] = useState(false)
   const imageUrl = image.image_url
+  const cardRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    if (cardRef.current) {
+      onHeightChange(cardRef.current.offsetHeight)
+    }
+  }, [onHeightChange])
   useEffect(() => {
     setIsLiked(image.likes.includes(user.user_id))
     setIsHated(image.hates.includes(user.user_id))
@@ -217,6 +224,7 @@ export default function ImageCard({ image, user }: ImageCardProps) {
     <motion.div
       whileHover={{ scale: 1.03 }}
       transition={{ type: "spring", stiffness: 300 }}
+      ref={cardRef}
     >
       <Card className='overflow-hidden group relative'>
         <CardContent className='p-0'>
@@ -232,6 +240,12 @@ export default function ImageCard({ image, user }: ImageCardProps) {
                   width={500}
                   height={300}
                   className='w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90'
+                  onLoad={({ target }) => {
+                    const img = target as HTMLImageElement
+                    if (cardRef.current) {
+                      onHeightChange(cardRef.current.offsetHeight)
+                    }
+                  }}
                 />
               </motion.div>
             </PhotoView>

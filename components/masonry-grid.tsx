@@ -1,22 +1,41 @@
 'use client'
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 
-interface MasonryGridProps {
-  items: React.ReactNode[]
-  columnWidth: number
+type ImageData = {
+  tags: string[]
+  image_url: string
+  comment: string[]
+  catalogue: string[]
+  under_review: boolean
+  timestamp: string
+  uploader: {
+    nickname: string
+    id: string
+    platform: string
+  }
+  likes: string[]
+  hates: string[]
+  image_hash: string
 }
 
-export function MasonryGrid({ items, columnWidth }: MasonryGridProps) {
+interface MasonryGridProps {
+  items: ImageData[]
+  columnWidth: number
+  renderItem: (item: ImageData, index: number, onHeightChange: (height: number) => void) => React.ReactNode
+}
+
+export function MasonryGrid({ items, columnWidth, renderItem }: MasonryGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
   const [columns, setColumns] = useState(1)
+  const [itemHeights, setItemHeights] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const updateColumns = () => {
       if (gridRef.current) {
-        const newColumns = Math.floor(gridRef.current.offsetWidth / columnWidth)
-        setColumns(newColumns || 1)
+        const newColumns = Math.max(1, Math.floor(gridRef.current.offsetWidth / columnWidth))
+        setColumns(newColumns)
       }
     }
 
@@ -25,10 +44,27 @@ export function MasonryGrid({ items, columnWidth }: MasonryGridProps) {
     return () => window.removeEventListener('resize', updateColumns)
   }, [columnWidth])
 
-  const columnItems: React.ReactNode[][] = Array.from({ length: columns }, () => [])
-  items.forEach((item, i) => {
-    return columnItems[i % columns].push(item)
-  })
+  const handleHeightChange = (index: number, height: number) => {
+    setItemHeights(prev => {
+      if (prev[index] === height) return prev
+      return { ...prev, [index]: height }
+    })
+  }
+
+  const renderedItems = useMemo(() => {
+    const columnHeights = new Array(columns).fill(0)
+    const newRenderedItems: React.ReactNode[][] = Array.from({ length: columns }, () => [])
+
+    items.forEach((item, index) => {
+      const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights))
+      newRenderedItems[shortestColumnIndex].push(
+        renderItem(item, index, (height) => handleHeightChange(index, height))
+      )
+      columnHeights[shortestColumnIndex] += itemHeights[index] || 0
+    })
+
+    return newRenderedItems
+  }, [items, columns, itemHeights, renderItem])
 
   return (
     <div
@@ -38,18 +74,9 @@ export function MasonryGrid({ items, columnWidth }: MasonryGridProps) {
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
       }}
     >
-      {columnItems.map((column, columnIndex) => (
+      {renderedItems.map((column, columnIndex) => (
         <div key={columnIndex} className="flex flex-col gap-4">
-          {column.map((item, itemIndex) => (
-            <motion.div
-              key={itemIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: itemIndex * 0.1 }}
-            >
-              {item}
-            </motion.div>
-          ))}
+          {column}
         </div>
       ))}
     </div>
