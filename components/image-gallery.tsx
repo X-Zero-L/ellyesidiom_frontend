@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, Search, Shuffle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ import ImageModal from './image-modal'
 import { Toaster } from './ui/toaster'
 import { useUser } from '@/app/contexts/UserContext'
 import { MasonryGrid } from './masonry-grid'
+import { DynamicBackground } from './dynamic-background'
 
 type ImageData = {
   tags: string[]
@@ -142,14 +143,25 @@ export default function ImageGallery() {
   if (!user) {
     return (
       <div className='flex items-center justify-center h-screen'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Loader2 className='w-12 h-12 animate-spin text-primary' />
+        </motion.div>
       </div>
     )
   }
 
-  return (
+  return (<>
     <div className='min-h-screen bg-gray-100'>
-      <div className='flex flex-col sm:flex-row gap-4 mb-8'>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className='flex flex-col sm:flex-row gap-4 mb-8'
+      >
         <div className='flex-1 flex gap-2'>
           <Input
             type='text'
@@ -179,32 +191,73 @@ export default function ImageGallery() {
             <Shuffle className='mr-2 h-4 w-4' /> 随机
           </Button>
         </div>
-      </div>
-      {loading && images.length === 0 ? (
-        <div className='flex items-center justify-center h-64'>
-          <Loader2 className='w-8 h-8 animate-spin text-primary' />
-        </div>
-      ) : error ? (
-        <div className='text-center text-red-500'>{error}</div>
-      ) : (
-        <>
-          <MasonryGrid
-            items={images}
-            columnWidth={300}
-            renderItem={(image, index, onHeightChange) => (
-              <ImageCard
-                key={`${image.image_hash}-${index}`}
-                image={image}
-                user={user}
-                onHeightChange={onHeightChange}
-              />
-            )}
-          />
-          <div ref={observerTarget} className='h-10 mt-8 flex justify-center items-center'>
-            {loadingMore && <Loader2 className='w-8 h-8 animate-spin text-primary' />}
-          </div>
-        </>
-      )}
+      </motion.div>
+      <AnimatePresence>
+        {loading && images.length === 0 ? (
+          <motion.div
+            key="loader"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className='flex items-center justify-center h-64'
+          >
+            <Loader2 className='w-12 h-12 animate-spin text-primary' />
+          </motion.div>
+        ) : error ? (
+          <motion.div
+            key="error"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className='text-center text-red-500 p-4 bg-red-100 rounded-md'
+          >
+            {error}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <MasonryGrid
+              items={images}
+              columnWidth={300}
+              renderItem={(image, index, onHeightChange) => (
+                <motion.div
+                  key={`${image.image_hash}-${index}`}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ImageCard
+                    image={image}
+                    user={user}
+                    onHeightChange={onHeightChange}
+                  />
+                </motion.div>
+              )}
+            />
+            <motion.div
+              ref={observerTarget}
+              className='h-20 mt-8 flex justify-center items-center'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: loadingMore ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {loadingMore && (
+                <motion.div
+                  initial={{ scale: 0.5 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+                >
+                  <Loader2 className='w-12 h-12 animate-spin text-primary' />
+                </motion.div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <ImageModal
         imageUrl={selectedImage || ''}
         isOpen={!!selectedImage}
@@ -212,6 +265,7 @@ export default function ImageGallery() {
       />
       <Toaster />
     </div>
+  </>
   )
 }
 
