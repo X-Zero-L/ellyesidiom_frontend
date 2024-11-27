@@ -55,7 +55,7 @@ interface UserModel {
   api_key: string | null
 }
 
-export default function ImageCard ({ image, user }: ImageCardProps) {
+export default function ImageCard({ image, user }: ImageCardProps) {
   const { toast } = useToast()
   const [isLiked, setIsLiked] = useState(false)
   const [isHated, setIsHated] = useState(false)
@@ -214,206 +214,216 @@ export default function ImageCard ({ image, user }: ImageCardProps) {
     }
   }
   return (
-    <Card className='overflow-hidden group relative'>
-      <CardContent className='p-0'>
-        <PhotoProvider>
-          <PhotoView src={image.image_url}>
-            <Image
-              src={image.image_url}
-              alt='Gallery Image'
-              width={500}
-              height={300}
-              className='w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90'
-            />
-          </PhotoView>
-        </PhotoProvider>
-        <motion.div
-          className='absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent'
-          initial='hidden'
-          animate='visible'
-          variants={containerVariants}
-        >
-          <div className='flex justify-between items-center'>
-            <motion.div className='flex space-x-2' variants={itemVariants}>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <motion.div
-                      variants={buttonVariants}
-                      whileHover='hover'
-                      whileTap='tap'
-                    >
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className={cn(
-                          'relative p-2 rounded-full transition-all duration-300 overflow-hidden',
-                          isLiked
-                            ? 'bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500'
-                            : 'bg-gray-200 dark:bg-gray-700'
-                        )}
-                        onClick={handleLike}
+    <motion.div
+      whileHover={{ scale: 1.03 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <Card className='overflow-hidden group relative'>
+        <CardContent className='p-0'>
+          <PhotoProvider>
+            <PhotoView src={image.image_url}>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                <Image
+                  src={image.image_url}
+                  alt='Gallery Image'
+                  width={500}
+                  height={300}
+                  className='w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90'
+                />
+              </motion.div>
+            </PhotoView>
+          </PhotoProvider>
+          <motion.div
+            className='absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent'
+            initial='hidden'
+            animate='visible'
+            variants={containerVariants}
+          >
+            <div className='flex justify-between items-center'>
+              <motion.div className='flex space-x-2' variants={itemVariants}>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <motion.div
+                        variants={buttonVariants}
+                        whileHover='hover'
+                        whileTap='tap'
                       >
-                        <Heart
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           className={cn(
-                            'h-5 w-5 transition-all duration-300',
+                            'relative p-2 rounded-full transition-all duration-300 overflow-hidden',
                             isLiked
-                              ? 'text-white fill-white'
-                              : 'text-gray-600 dark:text-gray-300'
+                              ? 'bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500'
+                              : 'bg-gray-200 dark:bg-gray-700'
                           )}
-                        />
-                        <motion.span
-                          className='ml-1'
-                          key={likes}
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
+                          onClick={handleLike}
                         >
-                          {likes}
-                        </motion.span>
-                      </Button>
-                    </motion.div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isLiked ? '不再赞同' : '深表赞同'}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <motion.div
-                      variants={buttonVariants}
-                      whileHover='hover'
-                      whileTap='tap'
-                    >
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className={cn(
-                          'p-2 rounded-full transition-all duration-300',
-                          isHated
-                            ? 'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500'
-                            : 'bg-gray-200 dark:bg-gray-700'
-                        )}
-                        onClick={handleHate}
+                          <Heart
+                            className={cn(
+                              'h-5 w-5 transition-all duration-300',
+                              isLiked
+                                ? 'text-white fill-white'
+                                : 'text-gray-600 dark:text-gray-300'
+                            )}
+                          />
+                          <motion.span
+                            className='ml-1'
+                            key={likes}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                          >
+                            {likes}
+                          </motion.span>
+                        </Button>
+                      </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isLiked ? '不再赞同' : '深表赞同'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <motion.div
+                        variants={buttonVariants}
+                        whileHover='hover'
+                        whileTap='tap'
                       >
-                        <ThumbsDown
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           className={cn(
-                            'h-5 w-5 transition-all duration-300',
-                            isHated ? 'text-white fill-white' : 'text-gray-500'
+                            'p-2 rounded-full transition-all duration-300',
+                            isHated
+                              ? 'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500'
+                              : 'bg-gray-200 dark:bg-gray-700'
                           )}
-                        />
-                        <motion.span
-                          className='ml-1'
-                          key={hates}
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
+                          onClick={handleHate}
                         >
-                          {hates}
-                        </motion.span>
-                      </Button>
-                    </motion.div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isHated ? '不够垃圾' : '垃圾怡言'}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <motion.div
-                      variants={buttonVariants}
-                      whileHover='hover'
-                      whileTap='tap'
-                    >
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className='text-white hover:bg-white/20'
-                        onClick={() => setShowDetails(true)}
+                          <ThumbsDown
+                            className={cn(
+                              'h-5 w-5 transition-all duration-300',
+                              isHated ? 'text-white fill-white' : 'text-gray-500'
+                            )}
+                          />
+                          <motion.span
+                            className='ml-1'
+                            key={hates}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                          >
+                            {hates}
+                          </motion.span>
+                        </Button>
+                      </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isHated ? '不够垃圾' : '垃圾怡言'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <motion.div
+                        variants={buttonVariants}
+                        whileHover='hover'
+                        whileTap='tap'
                       >
-                        <MessageCircle className='h-5 w-5' />
-                        <span className='ml-1'>{image.comment.length}</span>
-                      </Button>
-                    </motion.div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>显示详情</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </motion.div>
-            <motion.div className='flex space-x-2' variants={itemVariants}>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <motion.div
-                      variants={buttonVariants}
-                      whileHover='hover'
-                      whileTap='tap'
-                    >
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className='text-white hover:bg-white/20'
-                        onClick={handleDownload}
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='text-white hover:bg-white/20'
+                          onClick={() => setShowDetails(true)}
+                        >
+                          <MessageCircle className='h-5 w-5' />
+                          <span className='ml-1'>{image.comment.length}</span>
+                        </Button>
+                      </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>显示详情</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </motion.div>
+              <motion.div className='flex space-x-2' variants={itemVariants}>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <motion.div
+                        variants={buttonVariants}
+                        whileHover='hover'
+                        whileTap='tap'
                       >
-                        <Download className='h-5 w-5' />
-                      </Button>
-                    </motion.div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>下载图片</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <motion.div
-                      variants={buttonVariants}
-                      whileHover='hover'
-                      whileTap='tap'
-                    >
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className='text-white hover:bg-white/20'
-                        onClick={handleCopyToClipboard}
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='text-white hover:bg-white/20'
+                          onClick={handleDownload}
+                        >
+                          <Download className='h-5 w-5' />
+                        </Button>
+                      </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>下载图片</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <motion.div
+                        variants={buttonVariants}
+                        whileHover='hover'
+                        whileTap='tap'
                       >
-                        <ClipboardCopy className='h-5 w-5' />
-                      </Button>
-                    </motion.div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>复制到剪贴板</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </motion.div>
-          </div>
-        </motion.div>
-        <AnimatePresence>
-          {image.under_review && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className='absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded'
-            >
-              未审查
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </CardContent>
-      <ImageDetailsModal
-        image={image}
-        isOpen={showDetails}
-        onClose={() => setShowDetails(false)}
-      />
-    </Card>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='text-white hover:bg-white/20'
+                          onClick={handleCopyToClipboard}
+                        >
+                          <ClipboardCopy className='h-5 w-5' />
+                        </Button>
+                      </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>复制到剪贴板</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </motion.div>
+            </div>
+          </motion.div>
+          <AnimatePresence>
+            {image.under_review && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className='absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded'
+              >
+                未审查
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </CardContent>
+        <ImageDetailsModal
+          image={image}
+          isOpen={showDetails}
+          onClose={() => setShowDetails(false)}
+        />
+      </Card>
+    </motion.div>
   )
 }
