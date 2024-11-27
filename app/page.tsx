@@ -14,7 +14,7 @@ export default function HomePage() {
   useEffect(() => {
     if (!loading) {
       if (error || !user) {
-        router.push('/verify')
+        console.error('not logged in, redirecting to verify page')
       } else {
         setIsInitializing(false)
       }

@@ -56,8 +56,9 @@ export function VerificationPage() {
         setIsVerified(true)
         setUserId(data.user_id)
         setCurrentStep(3)
-        // 验证成功后立即重定向到首页
-        router.push('/')
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 1000)
       }
     } catch (error) {
       console.error('检查验证状态时出错:', error)

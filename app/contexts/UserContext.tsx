@@ -27,11 +27,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (pathname === '/verify') {
-        setLoading(false)
-        return
-      }
-
       try {
         const response = await fetch('/api/user/get_user_info')
         if (!response.ok) {
@@ -45,7 +40,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error('Error fetching user info:', err)
         setError('Failed to load user information')
-        router.push('/verify')
       } finally {
         setLoading(false)
       }

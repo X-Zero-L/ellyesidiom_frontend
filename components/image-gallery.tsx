@@ -62,21 +62,6 @@ export default function ImageGallery () {
     'index'
   )
   const { user } = useUser()
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('/api/user/logout', { method: 'POST' })
-      if (response.ok) {
-        router.push('/verify')
-      } else {
-        throw new Error('Logout failed')
-      }
-    } catch (err) {
-      console.error('Error during logout:', err)
-      setError('Failed to logout. Please try again.')
-    }
-  }
 
   const fetchImages = async (
     url: string,
