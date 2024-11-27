@@ -28,6 +28,7 @@
     "next": "14.2.15",
     "react": "^18",
     "react-dom": "^18",
+    "react-masonry-css": "^1.0.16",
     "react-photo-view": "^1.2.6",
     "react-zoom-pan-pinch": "^3.6.1",
     "tailwind-merge": "^2.5.4",
