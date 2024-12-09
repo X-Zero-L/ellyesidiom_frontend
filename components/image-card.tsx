@@ -1,174 +1,180 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Download,
   ClipboardCopy,
   Heart,
   MessageCircle,
   Tag,
-  ThumbsDown
-} from 'lucide-react'
-import { PhotoProvider, PhotoView } from 'react-photo-view'
-import { useToast } from '@/hooks/use-toast'
-import 'react-photo-view/dist/react-photo-view.css'
-import { ImageDetailsModal } from './image-detail-modal'
-import { QQAvatarList } from './like-avatars'
-import { cn } from '@/lib/utils'
+  ThumbsDown,
+} from "lucide-react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import { useToast } from "@/hooks/use-toast";
+import "react-photo-view/dist/react-photo-view.css";
+import { ImageDetailsModal } from "./image-detail-modal";
+import { QQAvatarList } from "./like-avatars";
+import { cn } from "@/lib/utils";
 
 type ImageData = {
-  tags: string[]
-  image_url: string
-  comment: string[]
-  catalogue: string[]
-  under_review: boolean
-  timestamp: string
+  tags: string[];
+  image_url: string;
+  comment: string[];
+  catalogue: string[];
+  under_review: boolean;
+  timestamp: string;
   uploader: {
-    nickname: string
-    id: string
-    platform: string
-  }
-  likes: string[]
-  hates: string[]
-  image_hash: string // Added image_hash field
-}
+    nickname: string;
+    id: string;
+    platform: string;
+  };
+  likes: string[];
+  hates: string[];
+  image_hash: string; // Added image_hash field
+};
 
 interface ImageCardProps {
-  image: ImageData
-  user: UserModel
-  onHeightChange: (height: number) => void
+  image: ImageData;
+  user: UserModel;
+  onHeightChange: (height: number) => void;
 }
 
 interface UserModel {
-  user_id: string
-  nickname: string
-  api_key: string | null
+  user_id: string;
+  nickname: string;
+  api_key: string | null;
 }
 
-export default function ImageCard({ image, user, onHeightChange }: ImageCardProps) {
-  const { toast } = useToast()
-  const [isLiked, setIsLiked] = useState(false)
-  const [isHated, setIsHated] = useState(false)
-  const [likes, setLikes] = useState(image.likes.length)
-  const [hates, setHates] = useState(image.hates.length)
-  const [showDetails, setShowDetails] = useState(false)
-  const imageUrl = image.image_url
-  const cardRef = useRef<HTMLDivElement>(null)
+export default function ImageCard({
+  image,
+  user,
+  onHeightChange,
+}: ImageCardProps) {
+  const { toast } = useToast();
+  const [isLiked, setIsLiked] = useState(false);
+  const [isHated, setIsHated] = useState(false);
+  const [likes, setLikes] = useState(image.likes.length);
+  const [hates, setHates] = useState(image.hates.length);
+  const [showDetails, setShowDetails] = useState(false);
+  const imageUrl = image.image_url;
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (cardRef.current) {
-      onHeightChange(cardRef.current.offsetHeight)
+      onHeightChange(cardRef.current.offsetHeight);
     }
-  }, [onHeightChange])
+  }, [onHeightChange]);
   useEffect(() => {
-    setIsLiked(image.likes.includes(user.user_id))
-    setIsHated(image.hates.includes(user.user_id))
-  }, [image.likes, user.user_id])
+    setIsLiked(image.likes.includes(user.user_id));
+    setIsHated(image.hates.includes(user.user_id));
+  }, [image.likes, user.user_id]);
 
   const handleDownload = async () => {
     try {
-      const response = await fetch('/api/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: imageUrl })
-      })
-      const data = await response.json()
-      const blob = new Blob([Buffer.from(data.base64, 'base64')], {
-        type: 'image/png'
-      })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'image.png'
-      link.click()
+      const response = await fetch("/api/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: imageUrl }),
+      });
+      const data = await response.json();
+      const blob = new Blob([Buffer.from(data.base64, "base64")], {
+        type: "image/png",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "image.png";
+      link.click();
     } catch (error) {
-      console.error('Download failed:', error)
+      console.error("Download failed:", error);
       toast({
-        title: '下载失败',
-        description: '请稍后重试',
-        variant: 'destructive'
-      })
+        title: "下载失败",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   const handleCopyToClipboard = async () => {
     try {
-      const response = await fetch('/api/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: imageUrl })
-      })
-      const data = await response.json()
+      const response = await fetch("/api/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: imageUrl }),
+      });
+      const data = await response.json();
       const blob = await (
         await fetch(`data:image/png;base64,${data.base64}`)
-      ).blob()
+      ).blob();
       await navigator.clipboard.write([
-        new ClipboardItem({ [blob.type]: blob })
-      ])
+        new ClipboardItem({ [blob.type]: blob }),
+      ]);
       toast({
-        title: '图片已复制到剪贴板',
-        description: '快粘贴到EP群里分享给大家吧！'
-      })
+        title: "图片已复制到剪贴板",
+        description: "快粘贴到EP群里分享给大家吧！",
+      });
     } catch (error) {
-      console.error('Copy to clipboard failed:', error)
+      console.error("Copy to clipboard failed:", error);
       toast({
-        title: '复制失败',
-        description: '请稍后重试',
-        variant: 'destructive'
-      })
+        title: "复制失败",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   const handleLike = async () => {
     try {
       if (isHated && !isLiked) {
-        throw new Error('你不能同时赞同和踩一个怡言')
+        throw new Error("你不能同时赞同和踩一个怡言");
       }
-      const endpoint = isLiked ? '/api/unlike' : '/api/like'
+      const endpoint = isLiked ? "/api/unlike" : "/api/like";
       const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_hash: image.image_hash })
-      })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_hash: image.image_hash }),
+      });
 
       if (response.ok) {
-        setIsLiked(!isLiked)
-        setLikes(isLiked ? likes - 1 : likes + 1)
+        setIsLiked(!isLiked);
+        setLikes(isLiked ? likes - 1 : likes + 1);
         toast({
-          title: isLiked ? '取消点赞成功' : '点赞成功',
-          description: isLiked ? '您已取消对该怡言的点赞' : '您已成功点赞该怡言'
-        })
+          title: isLiked ? "取消点赞成功" : "点赞成功",
+          description: isLiked
+            ? "您已取消对该怡言的点赞"
+            : "您已成功点赞该怡言",
+        });
         image.likes = isLiked
-          ? image.likes.filter(id => id !== user.user_id)
-          : [...image.likes, user.user_id]
+          ? image.likes.filter((id) => id !== user.user_id)
+          : [...image.likes, user.user_id];
       } else {
-        throw new Error('Failed to update like status')
+        throw new Error("Failed to update like status");
       }
     } catch (error: any) {
-      console.error('Like/Unlike failed:', error)
+      console.error("Like/Unlike failed:", error);
       toast({
-        title: '操作失败',
+        title: "操作失败",
         description: `${error.message}`,
-        variant: 'destructive'
-      })
+        variant: "destructive",
+      });
     }
-  }
+  };
   const buttonVariants = {
     rest: { scale: 1 },
     hover: { scale: 1.1 },
-    tap: { scale: 0.95 }
-  }
+    tap: { scale: 0.95 },
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -177,57 +183,57 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
       y: 0,
       transition: {
         delayChildren: 0.3,
-        staggerChildren: 0.1
-      }
-    }
-  }
+        staggerChildren: 0.1,
+      },
+    },
+  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
-  }
+    visible: { y: 0, opacity: 1 },
+  };
   const handleHate = async () => {
     try {
       if (isLiked && !isHated) {
-        throw new Error('你不能同时赞同和踩一个怡言')
+        throw new Error("你不能同时赞同和踩一个怡言");
       }
-      const endpoint = isHated ? '/api/unhate' : '/api/hate'
+      const endpoint = isHated ? "/api/unhate" : "/api/hate";
       const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_hash: image.image_hash })
-      })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_hash: image.image_hash }),
+      });
 
       if (response.ok) {
-        setIsHated(!isHated)
-        setHates(isHated ? hates - 1 : hates + 1)
+        setIsHated(!isHated);
+        setHates(isHated ? hates - 1 : hates + 1);
         toast({
-          title: isHated ? '取消踩成功' : '踩成功',
-          description: isHated ? '您已取消对该怡言的踩' : '您已成功踩该怡言'
-        })
+          title: isHated ? "取消踩成功" : "踩成功",
+          description: isHated ? "您已取消对该怡言的踩" : "您已成功踩该怡言",
+        });
         image.hates = isHated
-          ? image.hates.filter(id => id !== user.user_id)
-          : [...image.hates, user.user_id]
+          ? image.hates.filter((id) => id !== user.user_id)
+          : [...image.hates, user.user_id];
       } else {
-        throw new Error('Failed to update hate status')
+        throw new Error("Failed to update hate status");
       }
     } catch (error: any) {
-      console.error('Hate/Unhate failed:', error)
+      console.error("Hate/Unhate failed:", error);
       toast({
-        title: '操作失败',
+        title: "操作失败",
         description: `${error.message}`,
-        variant: 'destructive'
-      })
+        variant: "destructive",
+      });
     }
-  }
+  };
   return (
     <motion.div
       whileHover={{ scale: 1.03 }}
       transition={{ type: "spring", stiffness: 300 }}
       ref={cardRef}
     >
-      <Card className='overflow-hidden group relative'>
-        <CardContent className='p-0'>
+      <Card className="overflow-hidden group relative">
+        <CardContent className="p-0">
           <PhotoProvider>
             <PhotoView src={image.image_url}>
               <motion.div
@@ -236,14 +242,14 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
               >
                 <Image
                   src={image.image_url}
-                  alt='Gallery Image'
+                  alt="Gallery Image"
                   width={500}
                   height={300}
-                  className='w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90'
+                  className="w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90"
                   onLoad={({ target }) => {
-                    const img = target as HTMLImageElement
+                    const img = target as HTMLImageElement;
                     if (cardRef.current) {
-                      onHeightChange(cardRef.current.offsetHeight)
+                      onHeightChange(cardRef.current.offsetHeight);
                     }
                   }}
                 />
@@ -251,42 +257,42 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
             </PhotoView>
           </PhotoProvider>
           <motion.div
-            className='absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent'
-            initial='hidden'
-            animate='visible'
+            className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent"
+            initial="hidden"
+            animate="visible"
             variants={containerVariants}
           >
-            <div className='flex justify-between items-center'>
-              <motion.div className='flex space-x-2' variants={itemVariants}>
+            <div className="flex justify-between items-center">
+              <motion.div className="flex space-x-2" variants={itemVariants}>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <motion.div
                         variants={buttonVariants}
-                        whileHover='hover'
-                        whileTap='tap'
+                        whileHover="hover"
+                        whileTap="tap"
                       >
                         <Button
-                          variant='ghost'
-                          size='sm'
+                          variant="ghost"
+                          size="sm"
                           className={cn(
-                            'relative p-2 rounded-full transition-all duration-300 overflow-hidden',
+                            "relative p-2 rounded-full transition-all duration-300 overflow-hidden",
                             isLiked
-                              ? 'bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500'
-                              : 'bg-gray-200 dark:bg-gray-700'
+                              ? "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"
+                              : "bg-gray-200 dark:bg-gray-700"
                           )}
                           onClick={handleLike}
                         >
                           <Heart
                             className={cn(
-                              'h-5 w-5 transition-all duration-300',
+                              "h-5 w-5 transition-all duration-300",
                               isLiked
-                                ? 'text-white fill-white'
-                                : 'text-gray-600 dark:text-gray-300'
+                                ? "text-white fill-white"
+                                : "text-gray-600 dark:text-gray-300"
                             )}
                           />
                           <motion.span
-                            className='ml-1'
+                            className="ml-1"
                             key={likes}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -298,7 +304,7 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
                       </motion.div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{isLiked ? '不再赞同' : '深表赞同'}</p>
+                      <p>{isLiked ? "不再赞同" : "深表赞同"}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -307,28 +313,30 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
                     <TooltipTrigger asChild>
                       <motion.div
                         variants={buttonVariants}
-                        whileHover='hover'
-                        whileTap='tap'
+                        whileHover="hover"
+                        whileTap="tap"
                       >
                         <Button
-                          variant='ghost'
-                          size='sm'
+                          variant="ghost"
+                          size="sm"
                           className={cn(
-                            'p-2 rounded-full transition-all duration-300',
+                            "p-2 rounded-full transition-all duration-300",
                             isHated
-                              ? 'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500'
-                              : 'bg-gray-200 dark:bg-gray-700'
+                              ? "bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500"
+                              : "bg-gray-200 dark:bg-gray-700"
                           )}
                           onClick={handleHate}
                         >
                           <ThumbsDown
                             className={cn(
-                              'h-5 w-5 transition-all duration-300',
-                              isHated ? 'text-white fill-white' : 'text-gray-500'
+                              "h-5 w-5 transition-all duration-300",
+                              isHated
+                                ? "text-white fill-white"
+                                : "text-gray-500"
                             )}
                           />
                           <motion.span
-                            className='ml-1'
+                            className="ml-1"
                             key={hates}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -340,7 +348,7 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
                       </motion.div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{isHated ? '不够垃圾' : '垃圾怡言'}</p>
+                      <p>{isHated ? "不够垃圾" : "垃圾怡言"}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -349,17 +357,17 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
                     <TooltipTrigger asChild>
                       <motion.div
                         variants={buttonVariants}
-                        whileHover='hover'
-                        whileTap='tap'
+                        whileHover="hover"
+                        whileTap="tap"
                       >
                         <Button
-                          variant='ghost'
-                          size='sm'
-                          className='text-white hover:bg-white/20'
+                          variant="ghost"
+                          size="sm"
+                          className="text-white hover:bg-white/20"
                           onClick={() => setShowDetails(true)}
                         >
-                          <MessageCircle className='h-5 w-5' />
-                          <span className='ml-1'>{image.comment.length}</span>
+                          <MessageCircle className="h-5 w-5" />
+                          <span className="ml-1">{image.comment.length}</span>
                         </Button>
                       </motion.div>
                     </TooltipTrigger>
@@ -369,22 +377,22 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
                   </Tooltip>
                 </TooltipProvider>
               </motion.div>
-              <motion.div className='flex space-x-2' variants={itemVariants}>
+              <motion.div className="flex space-x-2" variants={itemVariants}>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <motion.div
                         variants={buttonVariants}
-                        whileHover='hover'
-                        whileTap='tap'
+                        whileHover="hover"
+                        whileTap="tap"
                       >
                         <Button
-                          variant='ghost'
-                          size='sm'
-                          className='text-white hover:bg-white/20'
+                          variant="ghost"
+                          size="sm"
+                          className="text-white hover:bg-white/20"
                           onClick={handleDownload}
                         >
-                          <Download className='h-5 w-5' />
+                          <Download className="h-5 w-5" />
                         </Button>
                       </motion.div>
                     </TooltipTrigger>
@@ -398,16 +406,16 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
                     <TooltipTrigger asChild>
                       <motion.div
                         variants={buttonVariants}
-                        whileHover='hover'
-                        whileTap='tap'
+                        whileHover="hover"
+                        whileTap="tap"
                       >
                         <Button
-                          variant='ghost'
-                          size='sm'
-                          className='text-white hover:bg-white/20'
+                          variant="ghost"
+                          size="sm"
+                          className="text-white hover:bg-white/20"
                           onClick={handleCopyToClipboard}
                         >
-                          <ClipboardCopy className='h-5 w-5' />
+                          <ClipboardCopy className="h-5 w-5" />
                         </Button>
                       </motion.div>
                     </TooltipTrigger>
@@ -425,7 +433,7 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className='absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded'
+                className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded"
               >
                 未审查
               </motion.div>
@@ -439,5 +447,5 @@ export default function ImageCard({ image, user, onHeightChange }: ImageCardProp
         />
       </Card>
     </motion.div>
-  )
+  );
 }

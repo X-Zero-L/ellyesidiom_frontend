@@ -1,8 +1,21 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ThumbsUp, MessageSquare, Calendar, Hash, Heart, MessageCircle, User } from "lucide-react";
+import {
+  ThumbsUp,
+  MessageSquare,
+  Calendar,
+  Hash,
+  Heart,
+  MessageCircle,
+  User,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 
@@ -19,16 +32,20 @@ type ImageData = {
     platform: string;
   };
   likes: string[];
-  hates: string[]
+  hates: string[];
 };
 
 type ImageDetailsModalProps = {
-  image: ImageData
-  isOpen: boolean
-  onClose: () => void
-}
+  image: ImageData;
+  isOpen: boolean;
+  onClose: () => void;
+};
 
-export function ImageDetailsModal({ image, isOpen, onClose }: ImageDetailsModalProps) {
+export function ImageDetailsModal({
+  image,
+  isOpen,
+  onClose,
+}: ImageDetailsModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl">
@@ -58,12 +75,12 @@ export function ImageDetailsModal({ image, isOpen, onClose }: ImageDetailsModalP
                   发布时间
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300">
-                  {new Date(image.timestamp).toLocaleString('zh-CN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                  {new Date(image.timestamp).toLocaleString("zh-CN", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </p>
               </div>
@@ -137,7 +154,10 @@ export function ImageDetailsModal({ image, isOpen, onClose }: ImageDetailsModalP
                   </h3>
                   <ul className="space-y-2">
                     {image.comment.map((comment, index) => (
-                      <li key={index} className="bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                      <li
+                        key={index}
+                        className="bg-gray-100 dark:bg-gray-700 p-2 rounded"
+                      >
                         {comment}
                       </li>
                     ))}
@@ -149,5 +169,5 @@ export function ImageDetailsModal({ image, isOpen, onClose }: ImageDetailsModalP
         </motion.div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
