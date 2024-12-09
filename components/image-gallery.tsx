@@ -19,6 +19,7 @@ import { useUser } from '@/app/contexts/UserContext'
 import { MasonryGrid } from './masonry-grid'
 import { DynamicBackground } from './dynamic-background'
 import { ScrollToTop } from './scroll-to-top'
+import { ToolBar } from './tool-bar'
 
 type ImageData = {
   tags: string[]
@@ -265,7 +266,7 @@ export default function ImageGallery() {
         onClose={handleCloseModal}
       />
       <Toaster />
-      <ScrollToTop />
+      <ToolBar />
     </div>
   </>
   )
