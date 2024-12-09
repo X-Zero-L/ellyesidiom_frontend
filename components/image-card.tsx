@@ -106,6 +106,32 @@ export default function ImageCard({
     }
   };
 
+  const handleShareImage = async () => {
+    try {
+      const response = await fetch("/api/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: imageUrl }),
+      });
+      const data = await response.json();
+      const blob = new Blob([Buffer.from(data.base64, "base64")], {
+        type: "image/png",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "image.png";
+      link.click();
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast({
+        title: "下载失败",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCopyToClipboard = async () => {
     try {
       const response = await fetch("/api/download", {
@@ -242,7 +268,7 @@ export default function ImageCard({
               >
                 <Image
                   src={image.image_url}
-                  alt="Gallery Image"
+                  alt="怡言图片"
                   width={500}
                   height={300}
                   className="w-full h-auto object-cover transition-opacity duration-300 group-hover:opacity-90"
@@ -390,14 +416,14 @@ export default function ImageCard({
                           variant="ghost"
                           size="sm"
                           className="text-white hover:bg-white/20"
-                          onClick={handleDownload}
+                          onClick={handleCopyToClipboard}
                         >
-                          <Download className="h-5 w-5" />
+                          <ClipboardCopy className="h-5 w-5" />
                         </Button>
                       </motion.div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>下载图片</p>
+                      <p>复制到剪贴板</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -413,14 +439,14 @@ export default function ImageCard({
                           variant="ghost"
                           size="sm"
                           className="text-white hover:bg-white/20"
-                          onClick={handleCopyToClipboard}
+                          onClick={handleShareImage}
                         >
-                          <ClipboardCopy className="h-5 w-5" />
+                          <Tag className="h-5 w-5" />
                         </Button>
                       </motion.div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>复制到剪贴板</p>
+                      <p>分享图片</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
