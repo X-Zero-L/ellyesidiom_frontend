@@ -107,6 +107,12 @@ export default function ImageCard({
   };
 
   const handleShareImage = async () => {
+    // 构建分享文本
+    const shareText = `来自 EP 的怡言
+${image.tags.length > 0 ? '标签: ' + image.tags.join(', ') : ''}
+${image.comment.length > 0 ? `评论数: ${image.comment.length}` : ''}
+点赞数: ${likes}`;
+
     if (navigator.share) {
       try {
         const response = await fetch("/api/download", {
@@ -121,19 +127,23 @@ export default function ImageCard({
         const file = new File([blob], "image.png", { type: "image/png" });
         await navigator.share({
           files: [file],
-          title: "EP",
-          text: "EP",
+          title: "EP 怡言分享",
+          text: shareText,
         });
       } catch (error) {
         console.error("Share failed:", error);
-        toast({
-          title: "分享失败",
-          description: "请稍后重试",
-          variant: "destructive",
-        });
       }
     } else {
-      alert("分享链接 " + window.location.href);
+      // 如果不支持原生分享，则复制分享文本到剪贴板
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
+        toast({
+          title: "链接已复制",
+          description: "分享链接已复制到剪贴板",
+        });
+      } catch (error) {
+        alert(`${shareText}\n分享链接: ${window.location.href}`);
+      }
     }
   };
 
@@ -226,7 +236,7 @@ export default function ImageCard({
   const handleHate = async () => {
     try {
       if (isLiked && !isHated) {
-        throw new Error("你不能同时赞同和踩一个怡言");
+        throw new Error("你不��同时赞同和踩一个怡言");
       }
       const endpoint = isHated ? "/api/unhate" : "/api/hate";
       const response = await fetch(endpoint, {
