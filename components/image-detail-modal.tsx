@@ -101,7 +101,7 @@ export function ImageDetailsModal({
             <DialogHeader className="p-6 pb-0">
               <div className="flex items-center justify-between">
                 <DialogTitle className="text-2xl font-bold">
-                  怡言详情
+                  怡言详情 {image.image_hash}
                 </DialogTitle>
               </div>
             </DialogHeader>
