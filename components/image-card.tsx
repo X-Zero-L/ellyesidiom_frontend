@@ -19,6 +19,8 @@ import {
   MessageCircle,
   Tag,
   ThumbsDown,
+  Share,
+  Share2,
 } from "lucide-react";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { useToast } from "@/hooks/use-toast";
@@ -124,7 +126,7 @@ ${image.comment.length > 0 ? `评论数: ${image.comment.length}` : ''}
         const blob = new Blob([Buffer.from(data.base64, "base64")], {
           type: "image/png",
         });
-        const file = new File([blob], "image.png", { type: "image/png" });
+        const file = new File([blob], "ellye_say.png", { type: "image/png" });
         await navigator.share({
           files: [file],
           title: "EP 怡言分享",
@@ -236,7 +238,7 @@ ${image.comment.length > 0 ? `评论数: ${image.comment.length}` : ''}
   const handleHate = async () => {
     try {
       if (isLiked && !isHated) {
-        throw new Error("你不��同时赞同和踩一个怡言");
+        throw new Error("你不能同时赞同和踩一个怡言");
       }
       const endpoint = isHated ? "/api/unhate" : "/api/hate";
       const response = await fetch(endpoint, {
@@ -456,7 +458,7 @@ ${image.comment.length > 0 ? `评论数: ${image.comment.length}` : ''}
                           className="text-white hover:bg-white/20"
                           onClick={handleShareImage}
                         >
-                          <Tag className="h-5 w-5" />
+                          <Share2 className="h-5 w-5" />
                         </Button>
                       </motion.div>
                     </TooltipTrigger>
