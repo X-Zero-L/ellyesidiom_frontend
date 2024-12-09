@@ -107,28 +107,33 @@ export default function ImageCard({
   };
 
   const handleShareImage = async () => {
-    try {
-      const response = await fetch("/api/download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: imageUrl }),
-      });
-      const data = await response.json();
-      const blob = new Blob([Buffer.from(data.base64, "base64")], {
-        type: "image/png",
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "image.png";
-      link.click();
-    } catch (error) {
-      console.error("Download failed:", error);
-      toast({
-        title: "下载失败",
-        description: "请稍后重试",
-        variant: "destructive",
-      });
+    if (navigator.share) {
+      try {
+        const response = await fetch("/api/download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: imageUrl }),
+        });
+        const data = await response.json();
+        const blob = new Blob([Buffer.from(data.base64, "base64")], {
+          type: "image/png",
+        });
+        const file = new File([blob], "image.png", { type: "image/png" });
+        await navigator.share({
+          files: [file],
+          title: "EP",
+          text: "EP",
+        });
+      } catch (error) {
+        console.error("Share failed:", error);
+        toast({
+          title: "分享失败",
+          description: "请稍后重试",
+          variant: "destructive",
+        });
+      }
+    } else {
+      alert("分享链接 " + window.location.href);
     }
   };
 
