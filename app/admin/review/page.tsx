@@ -42,22 +42,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-type ImageData = {
-  tags: string[];
-  image_hash: string;
-  image_ext: string;
-  ocr_text: string[];
-  ocr_method: string;
-  uploader: {
-    nickname: string;
-    id: string;
-    platform: string;
-  };
-  under_review: boolean;
-  comment: string[];
-  catalogue: string[];
-  timestamp: string;
-};
+import { AdminImageDetails } from "@/app/types/image";
 
 type DuplicateImage = {
   duplicate_idiom_hash: string;
@@ -67,15 +52,15 @@ type DuplicateImage = {
 };
 
 export default function AdminReview() {
-  const [images, setImages] = useState<ImageData[]>([]);
+  const [images, setImages] = useState<AdminImageDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingImage, setEditingImage] = useState<ImageData | null>(null);
-  const [editingImageTags, setEditingImageTags] = useState<ImageData | null>(
+  const [editingImage, setEditingImage] = useState<AdminImageDetails | null>(null);
+  const [editingImageTags, setEditingImageTags] = useState<AdminImageDetails | null>(
     null
   );
   const [editingImageComment, setEditingImageComment] =
-    useState<ImageData | null>(null);
-  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+    useState<AdminImageDetails | null>(null);
+  const [selectedImage, setSelectedImage] = useState<AdminImageDetails | null>(null);
   const router = useRouter();
   const { toast } = useToast();
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -313,7 +298,7 @@ export default function AdminReview() {
     );
   };
 
-  const handleEditCatalogue = (image: ImageData) => {
+  const handleEditCatalogue = (image: AdminImageDetails) => {
     setEditingImage(image);
   };
 

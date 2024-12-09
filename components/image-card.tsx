@@ -28,26 +28,10 @@ import "react-photo-view/dist/react-photo-view.css";
 import { ImageDetailsModal } from "./image-detail-modal";
 import { QQAvatarList } from "./like-avatars";
 import { cn } from "@/lib/utils";
-
-type ImageData = {
-  tags: string[];
-  image_url: string;
-  comment: string[];
-  catalogue: string[];
-  under_review: boolean;
-  timestamp: string;
-  uploader: {
-    nickname: string;
-    id: string;
-    platform: string;
-  };
-  likes: string[];
-  hates: string[];
-  image_hash: string; // Added image_hash field
-};
+import  { ImageDetails }  from "@/app/types/image";
 
 interface ImageCardProps {
-  image: ImageData;
+  image: ImageDetails;
   user: UserModel;
   onHeightChange: (height: number) => void;
 }

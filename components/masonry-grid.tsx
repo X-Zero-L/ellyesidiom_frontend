@@ -2,28 +2,12 @@
 
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-
-type ImageData = {
-  tags: string[]
-  image_url: string
-  comment: string[]
-  catalogue: string[]
-  under_review: boolean
-  timestamp: string
-  uploader: {
-    nickname: string
-    id: string
-    platform: string
-  }
-  likes: string[]
-  hates: string[]
-  image_hash: string
-}
+import { ImageDetails } from '@/app/types/image'
 
 interface MasonryGridProps {
-  items: ImageData[]
+  items: ImageDetails[]
   columnWidth: number
-  renderItem: (item: ImageData, index: number, onHeightChange: (height: number) => void) => React.ReactNode
+  renderItem: (item: ImageDetails, index: number, onHeightChange: (height: number) => void) => React.ReactNode
 }
 
 export function MasonryGrid({ items, columnWidth, renderItem }: MasonryGridProps) {

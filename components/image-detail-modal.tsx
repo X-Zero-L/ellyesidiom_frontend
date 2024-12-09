@@ -25,27 +25,54 @@ import { format, isToday, isYesterday } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { PhotoView, PhotoProvider } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
-type ImageData = {
-  tags: string[];
-  image_url: string;
-  comment: string[];
-  catalogue: string[];
-  under_review: boolean;
-  timestamp: string;
-  uploader: {
-    nickname: string;
-    id: string;
-    platform: string;
-  };
-  likes: string[];
-  hates: string[];
-};
+import { ImageDetails } from "@/app/types/image";
+
 
 type ImageDetailsModalProps = {
-  image: ImageData;
+  image: ImageDetails;
   isOpen: boolean;
   onClose: () => void;
 };
+
+interface AvatarGroupProps {
+  icon: React.ElementType;
+  title: string;
+  items: string[];
+  maxDisplay?: number;
+}
+
+function AvatarGroup({ icon: Icon, title, items, maxDisplay = 5 }: AvatarGroupProps) {
+  return (
+    <div className="space-y-2">
+      <h3 className="text-lg font-semibold flex items-center space-x-2">
+        <Icon className="h-5 w-5" />
+        <span>{title}</span>
+        <span>{items.length}</span>
+      </h3>
+      <div className="flex items-center">
+        <div className="flex -space-x-2">
+          {items.slice(0, maxDisplay).map((item, index) => (
+            <Avatar
+              key={index}
+              className="border-2 border-background"
+            >
+              <AvatarImage
+                src={`https://q1.qlogo.cn/g?b=qq&nk=${item}&s=100`}
+                alt={item}
+              />
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          ))}
+          {items.length > maxDisplay && (
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground text-sm font-medium border-2 border-background">
+              +{items.length - maxDisplay}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ImageDetailsModal({
   image,
@@ -130,62 +157,16 @@ export function ImageDetailsModal({
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold flex items-center space-x-2">
-                      <Heart className="h-5 w-5" />
-                      <span>喜欢</span>
-                      <span>{image.likes.length}</span>
-                    </h3>
-                    <div className="flex items-center">
-                      <div className="flex -space-x-2">
-                        {image.likes.slice(0, 5).map((like, index) => (
-                          <Avatar
-                            key={index}
-                            className="border-2 border-background"
-                          >
-                            <AvatarImage
-                              src={`https://q1.qlogo.cn/g?b=qq&nk=${like}&s=100`}
-                              alt={like}
-                            />
-                            <AvatarFallback>U</AvatarFallback>
-                          </Avatar>
-                        ))}
-                        {image.likes.length > 5 && (
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground text-sm font-medium border-2 border-background">
-                            +{image.likes.length - 5}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold flex items-center space-x-2">
-                      <ThumbsDown className="h-5 w-5" />
-                      <span>讨厌</span>
-                      <span>{image.hates.length}</span>
-                    </h3>
-                    <div className="flex items-center">
-                      <div className="flex -space-x-2">
-                        {image.hates.slice(0, 5).map((hate, index) => (
-                          <Avatar
-                            key={index}
-                            className="border-2 border-background"
-                          >
-                            <AvatarImage
-                              src={`https://q1.qlogo.cn/g?b=qq&nk=${hate}&s=100`}
-                              alt={hate}
-                            />
-                            <AvatarFallback>U</AvatarFallback>
-                          </Avatar>
-                        ))}
-                        {image.hates.length > 5 && (
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground text-sm font-medium border-2 border-background">
-                            +{image.hates.length - 5}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <AvatarGroup
+                    icon={Heart}
+                    title="喜欢"
+                    items={image.likes}
+                  />
+                  <AvatarGroup
+                    icon={ThumbsDown}
+                    title="讨厌"
+                    items={image.hates}
+                  />
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold flex items-center space-x-2">
                       <MessageCircle className="h-5 w-5" />
@@ -195,6 +176,11 @@ export function ImageDetailsModal({
                       <span>{image.comment.length}</span>
                     </div>
                   </div>
+                  <AvatarGroup
+                    icon={User}
+                    title="所属怡批"
+                    items={image.catalogue_raw}
+                  />
                 </div>
               </ScrollArea>
             </motion.div>
@@ -202,25 +188,5 @@ export function ImageDetailsModal({
         </Dialog>
       )}
     </AnimatePresence>
-  );
-}
-
-function InfoSection({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon?: React.ElementType;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold flex items-center space-x-2">
-        {Icon && <Icon className="h-5 w-5" />}
-        <span>{title}</span>
-      </h3>
-      <div className="text-gray-600 dark:text-gray-300">{children}</div>
-    </div>
   );
 }
