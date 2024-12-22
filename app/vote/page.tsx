@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { UserVoteModel, UserVoteSubmitModel } from "@/app/types/vote";
 import confetti from "canvas-confetti";
-import { ChevronLeft, Heart, Maximize2 } from "lucide-react";
+import { ChevronLeft, Heart, Maximize2 } from 'lucide-react';
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 
@@ -254,10 +254,18 @@ export default function VotePage() {
                 </motion.div>
               </AnimatePresence>
               <PhotoProvider>
-                <PhotoView
-                  src={`https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`}
-                >
-                  <Maximize2 className="absolute top-2 right-2 text-black" />
+                <PhotoView src={`https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`}>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="absolute top-2 right-2 w-6 h-6 text-white bg-black bg-opacity-50 rounded-full p-1 transition-opacity opacity-0 group-hover:opacity-100"
+                  >
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                  </svg>
                 </PhotoView>
               </PhotoProvider>
             </motion.div>
@@ -290,3 +298,4 @@ export default function VotePage() {
     </div>
   );
 }
+
