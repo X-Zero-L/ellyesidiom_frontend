@@ -8,7 +8,9 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { UserVoteModel, UserVoteSubmitModel } from "@/app/types/vote";
 import confetti from "canvas-confetti";
-import { ChevronLeft, Heart, Maximize2 } from 'lucide-react';
+import { ChevronLeft, Heart, Maximize2 } from "lucide-react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import "react-photo-view/dist/react-photo-view.css";
 
 export default function VotePage() {
   const [voteData, setVoteData] = useState<UserVoteModel | null>(null);
@@ -34,7 +36,7 @@ export default function VotePage() {
         variant: "destructive",
       });
     }
-  }
+  };
   useEffect(() => {
     // fetchIsFinished();
     fetchVoteData();
@@ -223,7 +225,6 @@ export default function VotePage() {
               exit={{ opacity: 0, y: -50 }}
               transition={{ duration: 0.5 }}
               className="relative cursor-pointer group"
-              onClick={() => handleVote(imageId)}
               onContextMenu={(e) =>
                 handleContextMenu(
                   e,
@@ -235,6 +236,7 @@ export default function VotePage() {
                 <motion.div
                   key={imageId}
                   className="overflow-hidden rounded-2xl shadow-2xl transition-all duration-300 group-hover:shadow-3xl group-hover:scale-105"
+                  onClick={() => handleVote(imageId)}
                   style={{
                     width: "100%",
                     paddingBottom: "100%",
@@ -251,13 +253,13 @@ export default function VotePage() {
                   />
                 </motion.div>
               </AnimatePresence>
-              <motion.div
-                className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Heart className="text-white w-12 h-12" />
-              </motion.div>
+              <PhotoProvider>
+                <PhotoView
+                  src={`https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`}
+                >
+                  <Maximize2 className="absolute top-2 right-2 text-black" />
+                </PhotoView>
+              </PhotoProvider>
             </motion.div>
           ))}
         </div>
@@ -288,4 +290,3 @@ export default function VotePage() {
     </div>
   );
 }
-
