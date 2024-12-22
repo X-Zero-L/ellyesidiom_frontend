@@ -11,8 +11,10 @@ import confetti from "canvas-confetti";
 import { ChevronLeft, Heart, Maximize2 } from "lucide-react";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
+import { useUser } from "../contexts/UserContext";
 
 export default function VotePage() {
+  const { user, loading, error } = useUser();
   const [voteData, setVoteData] = useState<UserVoteModel | null>(null);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
