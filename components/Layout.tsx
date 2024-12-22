@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  if (pathname === '/verify') {
+  if (pathname === '/verify' || pathname === '/vote') {
     return <>{children}</>
   }
 
