@@ -204,7 +204,7 @@ export default function VotePage() {
       <div className="container mx-auto flex flex-col items-center">
         <h1 className="text-5xl font-bold mb-8 text-center">年度怡言投票</h1>
         <p className="text-2xl mb-8 text-center">
-          从以下怡言中选择您最喜欢的一张（右键点击查看大图）
+          从以下怡言中选择您最喜欢的一张（右上角按钮查看大图）
         </p>
         <div className="w-full max-w-3xl mb-8">
           <Progress
