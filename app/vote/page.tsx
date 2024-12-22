@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { UserVoteModel, UserVoteSubmitModel } from "@/app/types/vote";
 import confetti from "canvas-confetti";
-import { ChevronLeft, Heart, Maximize2 } from 'lucide-react';
+import { ChevronLeft, Heart, Maximize2 } from "lucide-react";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 
@@ -38,7 +38,7 @@ export default function VotePage() {
     }
   };
   useEffect(() => {
-    // fetchIsFinished();
+    fetchIsFinished();
     fetchVoteData();
   }, []);
   const fetchVoteData = async () => {
@@ -213,89 +213,73 @@ export default function VotePage() {
             style={{ "--progress-color": "#ec4899" } as React.CSSProperties}
           />
         </div>
-        <p className="text-xl mb-12">
+        <p className="text-xl">
           已完成 {voteData.vote_count} / {voteData.vote_list.length} 次投票
         </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full max-w-5xl mb-8">
-          {currentGroup.map((imageId, index) => (
-            <motion.div
-              key={imageId}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ duration: 0.5 }}
-              className="relative cursor-pointer group"
-              onContextMenu={(e) =>
-                handleContextMenu(
-                  e,
-                  `https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`
-                )
-              }
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={imageId}
-                  className="overflow-hidden rounded-2xl shadow-2xl transition-all duration-300 group-hover:shadow-3xl group-hover:scale-105"
-                  onClick={() => handleVote(imageId)}
-                  style={{
-                    width: "100%",
-                    paddingBottom: "100%",
-                    position: "relative",
-                  }}
-                >
-                  <Image
-                    src={`https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`}
-                    alt="怡言图片"
-                    layout="fill"
-                    objectFit="cover"
-                    className="transition-transform duration-300 group-hover:scale-110"
-                    // onLoad={() => handleImageLoad(index)}
-                  />
-                </motion.div>
-              </AnimatePresence>
-              <PhotoProvider>
-                <PhotoView src={`https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`}>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="absolute top-2 right-2 w-6 h-6 text-white bg-black bg-opacity-50 rounded-full p-1 transition-opacity opacity-0 group-hover:opacity-100"
-                  >
-                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                  </svg>
-                </PhotoView>
-              </PhotoProvider>
-            </motion.div>
-          ))}
-        </div>
         <Button
           onClick={handleUndo}
           disabled={voteData.vote_record.length === 0}
-          className="mt-4 bg-transparent border border-white text-white hover:bg-white hover:text-purple-600 transition-colors duration-300"
+          className="mt-4 mb-12 bg-white text-black hover:bg-gray-200 hover:text-black"
         >
           <ChevronLeft className="mr-2" /> 撤销上一票
         </Button>
-      </div>
-      {previewImage && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
-          onClick={() => setPreviewImage(null)}
-        >
-          <div className="relative max-w-4xl max-h-4xl">
-            <Image
-              src={previewImage}
-              alt="预览图片"
-              width={1000}
-              height={1000}
-              className="max-w-full max-h-full object-contain"
-            />
+        <div className="left-0 right-0 w-full">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4 w-fit">
+            {currentGroup.map((imageId, index) => (
+              <motion.div
+                key={imageId}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.5 }}
+                className="relative cursor-pointer group break-inside-avoid mb-4"
+                onContextMenu={(e) =>
+                  handleContextMenu(
+                    e,
+                    `https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`
+                  )
+                }
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={imageId}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -50 }}
+                    transition={{ duration: 0.5 }}
+                    onClick={() => handleVote(imageId)}
+                  >
+                    <Image
+                      src={`https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`}
+                      alt="怡言图片"
+                      width={780}
+                      height={300}
+                      className="w-full h-auto object-cover rounded-lg shadow-lg transition-transform transform group-hover:scale-105"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+                <PhotoProvider>
+                  <PhotoView
+                    src={`https://ei-images.hypermax.app/${imageId}.${voteData.ext_info[imageId]}`}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="absolute top-2 right-2 w-6 h-6 text-white bg-black bg-opacity-50 rounded-full p-1 transition-opacity opacity-0 group-hover:opacity-100"
+                    >
+                      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                    </svg>
+                  </PhotoView>
+                </PhotoProvider>
+              </motion.div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
-
