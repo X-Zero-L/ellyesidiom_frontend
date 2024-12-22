@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 import { UserVoteModel, UserVoteSubmitModel } from "@/app/types/vote";
 import confetti from "canvas-confetti";
 import { ChevronLeft, Heart, Maximize2 } from "lucide-react";
@@ -21,6 +22,7 @@ export default function VotePage() {
   const [showResult, setShowResult] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
   // 如果已经完成投票，直接显示结果
   const fetchIsFinished = async () => {
     try {
@@ -64,6 +66,7 @@ export default function VotePage() {
       }
       setIsLoading(false);
     } catch (error) {
+      router.push("/verify");
       console.error("获取投票数据时出错:", error);
       toast({
         title: "获取投票数据失败",
