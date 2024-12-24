@@ -165,7 +165,7 @@ export function VerificationPage() {
                       exit={{ opacity: 0, y: -10 }}
                       className="text-green-500 text-sm mt-2"
                     >
-                      已复制到剪贴板
+                      已复制到剪贴板，请发送到ep群。（不要关闭本页面）
                     </motion.p>
                   )}
                 </div>
