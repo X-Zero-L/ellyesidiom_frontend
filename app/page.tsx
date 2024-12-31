@@ -54,7 +54,7 @@ export default function HomePage() {
         console.error("not logged in, redirecting to verify page");
       } else {
         setIsInitializing(false);
-        setShowVoteDialog(true); // 显示投票对话框
+        // setShowVoteDialog(true); // 显示投票对话框
       }
     }
   }, [user, loading, error, router]);
