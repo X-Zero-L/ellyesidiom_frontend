@@ -340,10 +340,10 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
             <motion.div
               ref={dropZoneRef}
               className={cn(
-                "border-2 border-dashed rounded-xl p-8 transition-all",
+                "relative border-2 border-dashed rounded-xl p-8 transition-all backdrop-blur-sm",
                 dragActive 
-                  ? "border-primary bg-primary/5" 
-                  : "border-gray-300 hover:border-gray-400",
+                  ? "border-purple-500 bg-gradient-to-br from-purple-500/10 to-pink-500/10 shadow-lg shadow-purple-500/20" 
+                  : "border-purple-200 hover:border-purple-300 bg-white/50",
                 selectedFiles.length >= 10 && "opacity-50 cursor-not-allowed"
               )}
               onDragEnter={handleDrag}
@@ -363,7 +363,21 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
               />
               
               <div className="text-center space-y-4">
-                <FileImage className="w-16 h-16 mx-auto text-gray-400" />
+                <motion.div
+                  animate={dragActive ? { scale: 1.1, rotate: [0, -5, 5, 0] } : {}}
+                  transition={{ duration: 0.5 }}
+                >
+                <div className="relative inline-block">
+                  <FileImage className="w-16 h-16 mx-auto text-purple-500" />
+                  <motion.div
+                    className="absolute inset-0 w-16 h-16 mx-auto"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <FileImage className="w-16 h-16 text-purple-400 opacity-50" />
+                  </motion.div>
+                </div>
+                </motion.div>
                 <p className="text-lg font-medium text-gray-700">
                   {dragActive ? "松开鼠标上传" : "拖拽图片或点击选择"}
                 </p>
@@ -385,7 +399,7 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
                       exit={{ opacity: 0, scale: 0.8 }}
                       className="relative group"
                     >
-                      <div className="aspect-square rounded-lg overflow-hidden">
+                      <div className="aspect-square rounded-xl overflow-hidden shadow-lg shadow-purple-500/10 ring-2 ring-purple-100 hover:ring-purple-300 transition-all">
                         <img
                           src={file.preview}
                           alt={file.name}
@@ -397,11 +411,11 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
                           e.stopPropagation();
                           removeFile(file.id!);
                         }}
-                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:scale-110"
                       >
                         <X className="w-3 h-3" />
                       </button>
-                      <Badge className="absolute top-2 left-2 text-xs">
+                      <Badge className="absolute top-2 left-2 text-xs bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 shadow-md">
                         {index + 1}
                       </Badge>
                     </motion.div>
@@ -473,8 +487,8 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {filteredCatalogues.map((cat) => (
-                    <div
+                  {filteredCatalogues.map((cat, index) => (
+                    <motion.div
                       key={cat.id}
                       onClick={() => {
                         if (catalogues.includes(cat.id)) {
@@ -483,15 +497,32 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
                           setCatalogues([...catalogues, cat.id]);
                         }
                       }}
-                      className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      className="flex items-center space-x-3 p-3 rounded-xl hover:bg-purple-50 transition-all cursor-pointer group card-hover preserve-3d"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileHover={{ scale: 1.02, rotateY: 5 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ 
+                        delay: index * 0.05,
+                        type: "spring", 
+                        stiffness: 300 
+                      }}
                     >
                       <div className="relative w-10 h-10 flex-shrink-0">
+                        {catalogues.includes(cat.id) && (
+                          <motion.div
+                            className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 opacity-75 blur animate-pulse-soft"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1.1, opacity: 0.75 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
                         <Image
                           src={`https://q1.qlogo.cn/g?b=qq&nk=${cat.id}&s=100`}
                           alt={`QQ Avatar for ${cat.id}`}
                           layout="fill"
                           objectFit="cover"
-                          className="rounded-full"
+                          className="rounded-full ring-2 ring-purple-100 group-hover:ring-purple-300 transition-all relative z-10"
                           onError={(e: any) => {
                             e.target.src = '/placeholder-avatar.png';
                           }}
@@ -511,7 +542,7 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
                       <div className="flex-shrink-0">
                         <div
                           className={cn(
-                            "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+                            "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
                             catalogues.includes(cat.id)
                               ? "bg-primary border-primary"
                               : "border-gray-300"
@@ -522,7 +553,7 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
                           )}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -652,43 +683,102 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
           )}
         </DialogTrigger>
         
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle className="text-xl">上传怡言</DialogTitle>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden glass border-0 shadow-2xl shadow-purple-500/20">
+          {/* Gradient Border Effect */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-purple-500/20 blur-sm -z-10" />
+          <DialogHeader className="relative">
+            <DialogTitle className="text-xl gradient-text">上传怡言</DialogTitle>
+            <motion.div
+              className="absolute -top-2 -right-2"
+              animate={{ 
+                rotate: [0, 10, -10, 0],
+                scale: [1, 1.1, 0.9, 1]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <Sparkles className="w-5 h-5 text-purple-500/50" />
+            </motion.div>
             <DialogDescription>
               请按照步骤上传您的图片
             </DialogDescription>
           </DialogHeader>
 
           {/* Progress Steps */}
-          <div className="flex items-center justify-center py-4">
+          <div className="flex items-center justify-center py-6 px-4 bg-gradient-to-r from-purple-50/50 to-pink-50/50 rounded-xl">
             {STEPS.map((step, index) => {
               const Icon = step.icon;
+              const isActive = index === currentStep;
+              const isCompleted = index < currentStep;
+              
               return (
-                <div key={step.id} className="flex items-center">
-                  <div
+                <div key={step.id} className="flex items-center relative">
+                  <motion.div
                     className={cn(
-                      "flex items-center justify-center w-10 h-10 rounded-full transition-colors",
-                      index === currentStep
-                        ? "bg-primary text-white"
-                        : index < currentStep
-                        ? "bg-primary/20 text-primary"
-                        : "bg-gray-100 text-gray-400"
+                      "flex flex-col items-center gap-2 relative",
+                      index !== 0 && "ml-2"
                     )}
+                    animate={{
+                      scale: isActive ? 1.1 : 1,
+                    }}
+                    transition={{ type: "spring", stiffness: 300 }}
                   >
-                    {index < currentStep ? (
-                      <Check className="w-5 h-5" />
-                    ) : (
-                      <Icon className="w-5 h-5" />
-                    )}
-                  </div>
-                  {index < STEPS.length - 1 && (
-                    <div
+                    <motion.div
                       className={cn(
-                        "w-12 h-1 mx-2 transition-colors",
-                        index < currentStep ? "bg-primary" : "bg-gray-200"
+                        "flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg",
+                        isActive
+                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-purple-500/25"
+                          : isCompleted
+                          ? "bg-purple-200 text-purple-700"
+                          : "bg-gray-100 text-gray-400 shadow-gray-200/50"
                       )}
-                    />
+                      whileHover={{ scale: 1.05 }}
+                      animate={isActive ? {
+                        boxShadow: [
+                          "0 0 0 0 rgba(168, 85, 247, 0.4)",
+                          "0 0 0 10px rgba(168, 85, 247, 0)",
+                          "0 0 0 0 rgba(168, 85, 247, 0.4)"
+                        ]
+                      } : {}}
+                      transition={{
+                        duration: 1.5,
+                        repeat: isActive ? Infinity : 0
+                      }}
+                    >
+                      {isCompleted ? (
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        >
+                          <Check className="w-6 h-6" />
+                        </motion.div>
+                      ) : (
+                        <Icon className="w-6 h-6" />
+                      )}
+                    </motion.div>
+                    <motion.span 
+                      className={cn(
+                        "text-xs font-medium absolute -bottom-6 whitespace-nowrap",
+                        isActive ? "text-purple-700" : "text-gray-500"
+                      )}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      {step.title}
+                    </motion.span>
+                  </motion.div>
+                  
+                  {index < STEPS.length - 1 && (
+                    <div className="relative ml-4 mr-2">
+                      <div className="w-16 h-0.5 bg-gray-200" />
+                      <motion.div
+                        className="absolute top-0 left-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600"
+                        initial={{ width: 0 }}
+                        animate={{ width: isCompleted ? "100%" : "0%" }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                      />
+                    </div>
                   )}
                 </div>
               );

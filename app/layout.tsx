@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { UserProvider } from "./contexts/UserContext";
 import Layout from "@/components/Layout";
+import { AnimatedBackground } from "@/components/animated-background";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <UserProvider>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <AnimatedBackground />
           <Layout>{children}</Layout>
         </body>
       </UserProvider>
