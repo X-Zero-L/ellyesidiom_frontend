@@ -20,6 +20,7 @@ import { MasonryGrid } from "./masonry-grid";
 import { DynamicBackground } from "./dynamic-background";
 import { ScrollToTop } from "./scroll-to-top";
 import { ToolBar } from "./tool-bar";
+import { UploadDialogMultiStep as UploadDialog } from "./upload-dialog-multistep";
 import { ImageDetails } from "@/app/types/image";
 export default function ImageGallery() {
   const [images, setImages] = useState<ImageDetails[]>([]);
@@ -181,6 +182,13 @@ export default function ImageGallery() {
             <Button onClick={handleRandom}>
               <Shuffle className="mr-2 h-4 w-4" /> 随机
             </Button>
+            <UploadDialog 
+              onUploadSuccess={() => {
+                // Refresh to latest images after successful upload
+                fetchImages("/api/index");
+                setCurrentPage("index");
+              }}
+            />
           </div>
         </motion.div>
         <AnimatePresence>

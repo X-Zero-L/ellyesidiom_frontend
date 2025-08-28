@@ -7,5 +7,4 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3888:3000"
-    volumes:
-      - .:/app
+    restart: always
