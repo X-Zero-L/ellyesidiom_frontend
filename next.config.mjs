@@ -5,25 +5,25 @@ const nextConfig = {
         remotePatterns: [
           {
             protocol: 'https',
-            hostname: '*ap-shanghai.myqcloud.com',
+            hostname: '**.myqcloud.com',
             port: '',
             pathname: '/**',
           },
           {
             protocol: 'https',
-            hostname: '*hypermax.app',
+            hostname: '**.hypermax.app',
             port: '',
             pathname: '/**',
           },
           {
             protocol: "http",
-            hostname: "*maxng.cc",
+            hostname: "**.maxng.cc",
             port: "3889",
             pathname: "/**",
           },
           {
             protocol: "https",
-            hostname: "*qlogo.cn",
+            hostname: "**.qlogo.cn",
             port: "",
             pathname: "/**",
           }
