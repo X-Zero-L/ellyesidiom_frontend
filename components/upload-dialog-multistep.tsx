@@ -272,7 +272,24 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
       const result = await response.json();
 
       if (response.ok && result.success) {
-        triggerConfetti();
+        // Close dialog immediately
+        selectedFiles.forEach(file => {
+          if (file.preview) {
+            URL.revokeObjectURL(file.preview);
+          }
+        });
+        setSelectedFiles([]);
+        setTags([]);
+        setComments([]);
+        setCatalogues([]);
+        setOpen(false);
+        setCurrentStep(0);
+        
+        // Show confetti after dialog closes
+        setTimeout(() => {
+          triggerConfetti();
+        }, 100);
+        
         toast.success(result.data.message || "上传成功");
         
         if (result.data.warnings && result.data.warnings.length > 0) {
@@ -280,20 +297,6 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
             toast.warning(warning);
           });
         }
-
-        setTimeout(() => {
-          selectedFiles.forEach(file => {
-            if (file.preview) {
-              URL.revokeObjectURL(file.preview);
-            }
-          });
-          setSelectedFiles([]);
-          setTags([]);
-          setComments([]);
-          setCatalogues([]);
-          setOpen(false);
-          setCurrentStep(0);
-        }, 2000);
 
         if (onUploadSuccess) {
           onUploadSuccess(result.data);
@@ -676,7 +679,7 @@ export function UploadDialogMultiStep({ trigger, onUploadSuccess }: UploadDialog
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {trigger || (
-            <Button variant="outline" size="sm">
+            <Button>
               <Upload className="w-4 h-4 mr-2" />
               上传怡言
             </Button>
