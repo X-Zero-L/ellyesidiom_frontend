@@ -18,10 +18,11 @@ export async function POST(request: Request) {
   const data = responseData.data
 
   if (data.verified) {
-    cookies().set('user_id', data.user_id, {
+    const cookieStore = await cookies()
+    cookieStore.set('user_id', data.user_id, {
       maxAge: 60 * 60 * 24 * 7
     })
-    cookies().set('api_key', data.api_key, {
+    cookieStore.set('api_key', data.api_key, {
       maxAge: 60 * 60 * 24 * 7
     })
   }

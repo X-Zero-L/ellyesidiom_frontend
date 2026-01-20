@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const { password } = await request.json()
 
   if (password === CORRECT_PASSWORD && CORRECT_PASSWORD) {
-    cookies().set('adminToken', CORRECT_PASSWORD, {
+    (await cookies()).set('adminToken', CORRECT_PASSWORD, {
         maxAge: 60 * 60 * 24 * 7,
     })
     return NextResponse.json({ success: true })

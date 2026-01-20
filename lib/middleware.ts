@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 async function verifyCookie() {
-  const adminToken = cookies().get("adminToken")?.value;
+  const adminToken = (await cookies()).get("adminToken")?.value;
   if ((adminToken as string) !== (process.env.EI_API_KEY as string)) {
     return "Unauthorized";
   }
@@ -10,7 +10,7 @@ async function verifyCookie() {
 }
 
 async function verifyAPIKey() {
-  const apiKey = cookies().get("api_key")?.value;
+  const apiKey = (await cookies()).get("api_key")?.value;
   if (!apiKey) {
     return "Unauthorized";
   }
