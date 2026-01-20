@@ -112,6 +112,7 @@ export default function ImageModal({
                     alt="Full size image"
                     width={1200}
                     height={800}
+                    unoptimized={true}
                     className="object-contain max-w-full max-h-[80vh] w-auto h-auto"
                     onLoadingComplete={() => setIsLoading(false)}
                   />

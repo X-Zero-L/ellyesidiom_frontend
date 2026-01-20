@@ -261,6 +261,7 @@ export default function ImagePage() {
                       layout="fill"
                       objectFit="contain"
                       priority
+                      unoptimized={true}
                       className="transition-transform duration-300"
                     />
                     <AnimatePresence>

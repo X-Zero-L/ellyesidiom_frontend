@@ -120,6 +120,7 @@ export function ImageDetailsModal({
                       alt="怡言图片"
                       layout="fill"
                       objectFit="cover"
+                      unoptimized={true}
                       className="transition-transform duration-300 hover:scale-105"
                     />
                   </PhotoView>

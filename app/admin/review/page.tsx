@@ -430,6 +430,7 @@ export default function AdminReview() {
                       alt="Review image"
                       layout="fill"
                       objectFit="cover"
+                      unoptimized={true}
                       className="bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
                     />
                   </PhotoView>
@@ -623,6 +624,7 @@ export default function AdminReview() {
                                     alt="Duplicate image"
                                     layout="fill"
                                     objectFit="cover"
+                                    unoptimized={true}
                                     className="bg-black bg-opacity-60 opacity-100 hover:opacity-80 transition-opacity duration-300"
                                   />
                                 </PhotoView>

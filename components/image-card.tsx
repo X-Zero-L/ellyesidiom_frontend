@@ -265,6 +265,7 @@ ${image.comment.length > 0 ? `评论数: ${image.comment.length}` : ''}
                   alt="怡言图片"
                   width={500}
                   height={300}
+                  unoptimized={true}
                   className="w-full h-auto object-cover transition-all duration-300 group-hover:opacity-90 group-hover:scale-105"
                   onLoad={({ target }) => {
                     const img = target as HTMLImageElement;
